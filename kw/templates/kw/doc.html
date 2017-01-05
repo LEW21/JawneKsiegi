@@ -1,0 +1,110 @@
+{% extends "kw/base.html" %}
+
+{% load money %}
+
+{% block title %}{{doc}}{% endblock %}
+
+{% block top %}
+<h1>{{doc}}</h1>
+
+<dl class="dl-horizontal">
+	<dt>Data</dt>
+	<dd>{{doc.date}}</dd>
+
+	{% if doc.contractor %}
+		<dt>Kontrahent</dt>
+		<dd><a href="{{doc.contractor.url}}">{{doc.contractor.pub_name}}</a></dd>
+	{% endif %}
+
+	{% if doc.type == "P" %}
+		<dt>Właściciel rachunku</dt>
+		<dd><a href="{{doc.issuer.url}}">{{doc.issuer.pub_name}}</a></dd>
+	{% endif %}
+
+	{% if doc.title %}
+		<dt>Tytuł</dt>
+		<dd>{{doc.title}}</dd>
+	{% endif %}
+
+	{% if doc.seller %}
+		<dt>Sprzedawca</dt>
+		<dd><a href="{{doc.seller.url}}">{{doc.seller.pub_name}}</a></dd>
+	{% endif %}
+
+	{% if doc.buyer %}
+		<dt>Kupujący</dt>
+		<dd><a href="{{doc.buyer.url}}">{{doc.buyer.pub_name}}</a></dd>
+	{% endif %}
+
+	<dt>Kwota</dt>
+	<dd>{{doc.amount|money}} PLN</dd>
+
+	{% if doc.pit_amount > 0 %}
+		<dt>Kwota PIT</dt>
+		<dd>{{doc.pit_amount|money}} PLN</dd>
+	{% endif %}
+</dl>
+{% endblock %}
+
+{% block content %}
+
+{% if doc.lines %}
+<h2>Pozycje faktury</h2>
+<div class="unit">
+<table class="table">
+	<thead>
+		<tr>
+			<th>Lp.</th>
+			<th>Typ wydatku</th>
+			<th>Kwota</th>
+		</tr>
+	</thead>
+	{% for line in doc.lines.all %}
+		<tr>
+			<td>{{line.number}}</td>
+			<td><a href="{{line.account.url}}">{{line.account.pub_name}}</a></td>
+			<td>{{line.amount|money}} PLN</td>
+		</tr>
+	{% endfor %}
+</table>
+</div>
+{% endif %}
+
+<h2>Dekret księgowy</h2>
+<div class="unit" style="display: inline-block;">
+<table class="table" style="width: auto">
+	<thead>
+		<tr>
+			<th>Data</th>
+			<th>Wn</th>
+			<th>Ma</th>
+			<th>Kwota</th>
+		</tr>
+	</thead>
+	{% for t in doc.events.all %}
+		<tr>
+			<td>{{t.doc.date}}</td>
+			<td><a href="{{t.dst.url}}" title="{{t.dst.pub_name}}">{{t.dst.num_id}}</a></td>
+			<td><a href="{{t.src.url}}" title="{{t.src.pub_name}}">{{t.src.num_id}}</a></td>
+			<td>{{t.amount|money}}</td>
+		</tr>
+	{% endfor %}
+</table>
+</div>
+
+{% if doc.files.all %}
+<h2>Pliki</h2>
+<ul class="media-list">
+	{% for a in doc.files.all %}
+		{% if a.public %}
+			<li class="media">
+				<div class="media-body">
+					<h4 class="media-heading"><a href="{{a.url}}">{{a.name}}</a></h4>
+				</div>
+			</li>
+		{% endif %}
+	{% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

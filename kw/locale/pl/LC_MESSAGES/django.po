@@ -1,0 +1,335 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2015 Janusz Lewandowski
+# This file is distributed under the same license as the PACKAGE package.
+# Janusz Lewandowski <janusz.lewandowski@db.org.pl>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-23 23:07+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Janusz Lewandowski <janusz.lewandowski@db.org.pl>\n"
+"Language-Team: Polish <janusz.lewandowski@db.org.pl>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: kw/importer/import_data.py:23
+msgid "Imported: "
+msgstr "Zaimportowałem: "
+
+#: kw/importer/import_data.py:25
+msgid "Skipping: "
+msgstr "Omijam: "
+
+#: kw/models.py:7 kw/models.py:130 kw/models.py:215
+msgid "account"
+msgstr "konto"
+
+#: kw/models.py:8
+msgid "accounts"
+msgstr "konta"
+
+#: kw/models.py:11
+msgid "numeric id"
+msgstr "numeryczne ID"
+
+#: kw/models.py:12
+msgid "shortcut"
+msgstr "skrót"
+
+#: kw/models.py:13 kw/models.py:146 kw/models.py:244
+msgid "name"
+msgstr "nazwa"
+
+#: kw/models.py:14
+msgid "address"
+msgstr "adres"
+
+#: kw/models.py:15
+msgid "bank account"
+msgstr "konto bankowe"
+
+#: kw/models.py:16
+msgid "locality"
+msgstr "miejscowość"
+
+#: kw/models.py:17
+msgid "facebook id"
+msgstr "ID konta Facebook"
+
+#: kw/models.py:19
+msgid "publish name?"
+msgstr "p. n.?"
+
+#: kw/models.py:20
+msgid "publish locality?"
+msgstr "p. m.?"
+
+#: kw/models.py:21
+msgid "publish address?"
+msgstr "p. a.?"
+
+#: kw/models.py:22
+msgid "publish bank account?"
+msgstr "p. k.b.?"
+
+#: kw/models.py:23
+msgid "publish facebook?"
+msgstr "p. f.?"
+
+#: kw/models.py:104
+msgid "account relation type"
+msgstr "typ relacji kont"
+
+#: kw/models.py:105
+msgid "account relation types"
+msgstr "typy relacji kont"
+
+#: kw/models.py:107
+msgid "text id"
+msgstr "tekstowe ID"
+
+#: kw/models.py:114
+msgid "account relation"
+msgstr "relacja kont"
+
+#: kw/models.py:115
+msgid "account relations"
+msgstr "relacje kont"
+
+#: kw/models.py:117 kw/models.py:229
+msgid "from"
+msgstr "od (ma)"
+
+#: kw/models.py:118 kw/models.py:170
+msgid "type"
+msgstr "typ"
+
+#: kw/models.py:119 kw/models.py:230
+msgid "to"
+msgstr "do (wn)"
+
+#: kw/models.py:126
+msgid "turnover"
+msgstr "obrót"
+
+#: kw/models.py:127
+msgid "turnovers"
+msgstr "obroty"
+
+#: kw/models.py:131
+msgid "debit"
+msgstr "wn"
+
+#: kw/models.py:132
+msgid "credit"
+msgstr "ma"
+
+#: kw/models.py:133
+msgid "balance"
+msgstr "saldo"
+
+#: kw/models.py:142
+msgid "document type"
+msgstr "typ dokumentów"
+
+#: kw/models.py:143
+msgid "document types"
+msgstr "typy dokumentów"
+
+#: kw/models.py:145
+msgid "id"
+msgstr "id"
+
+#: kw/models.py:162 kw/models.py:227 kw/models.py:243
+msgid "document"
+msgstr "dokument"
+
+#: kw/models.py:163
+msgid "documents"
+msgstr "dokumenty"
+
+#: kw/models.py:167
+msgid "date"
+msgstr "data"
+
+#: kw/models.py:168
+msgid "date posted"
+msgstr "data zapisu księgowego"
+
+#: kw/models.py:171
+msgid "issuer"
+msgstr "wystawca"
+
+#: kw/models.py:172 kw/models.py:214
+msgid "number"
+msgstr "numer"
+
+#: kw/models.py:183
+msgid "bank transfer"
+msgstr "przelew"
+
+#: kw/models.py:184
+msgid "bank transfers"
+msgstr "przelewy"
+
+#: kw/models.py:186
+msgid "contractor"
+msgstr "kontrahent"
+
+#: kw/models.py:187 kw/models.py:216 kw/models.py:228 kw/models.py:266
+#: kw/models.py:268
+msgid "amount"
+msgstr "kwota (gr)"
+
+#: kw/models.py:188
+msgid "title"
+msgstr "tytuł"
+
+#: kw/models.py:196 kw/models.py:213
+msgid "invoice"
+msgstr "faktura"
+
+#: kw/models.py:197
+msgid "invoices"
+msgstr "faktury"
+
+#: kw/models.py:199
+msgid "date of sale"
+msgstr "data sprzedaży"
+
+#: kw/models.py:200
+msgid "seller"
+msgstr "sprzedawca"
+
+#: kw/models.py:201
+msgid "buyer"
+msgstr "kupujący"
+
+#: kw/models.py:202
+msgid "PIT amount"
+msgstr "kwota PIT (gr)"
+
+#: kw/models.py:210
+msgid "invoice line"
+msgstr "linia faktury"
+
+#: kw/models.py:211
+msgid "invoice lines"
+msgstr "linie faktury"
+
+#: kw/models.py:223
+msgid "event"
+msgstr "zdarzenie"
+
+#: kw/models.py:224
+msgid "events"
+msgstr "zdarzenia"
+
+#: kw/models.py:240
+msgid "attachment"
+msgstr "załącznik"
+
+#: kw/models.py:241
+msgid "attachments"
+msgstr "załączniki"
+
+#: kw/models.py:245
+msgid "file"
+msgstr "plik"
+
+#: kw/models.py:246
+msgid "public"
+msgstr "publiczny"
+
+#: kw/models.py:253
+msgid "bank transfer interpretation rule"
+msgstr "reguła interpretacji przelewów"
+
+#: kw/models.py:254
+msgid "bank transfer interpretation rules"
+msgstr "reguły interpretacji przelewów"
+
+#: kw/models.py:257
+msgid "priority"
+msgstr "priorytet"
+
+#: kw/models.py:258
+msgid "match title"
+msgstr "dopasuj tytuł"
+
+#: kw/models.py:259
+msgid "min amount"
+msgstr "min. kwota (gr)"
+
+#: kw/models.py:260
+msgid "max amount"
+msgstr "maks. kwota (gr)"
+
+#: kw/models.py:261
+msgid "match contractor"
+msgstr "dopasuj kontrahenta"
+
+#: kw/models.py:275
+msgid "generated event"
+msgstr "generowane zdarzenie"
+
+#: kw/models.py:276
+msgid "generated events"
+msgstr "generowane zdarzenia"
+
+#: kw/models.py:278
+msgid "rule"
+msgstr "reguła"
+
+#: kw/models.py:280
+msgid "from (preset)"
+msgstr "od (stałe)"
+
+#: kw/models.py:281
+msgid "from (matched transfer's contractor's rel)"
+msgstr "od (relacja kontrahenta dopasowanego przelewu)"
+
+#: kw/models.py:282
+msgid "to (preset)"
+msgstr "do (stałe)"
+
+#: kw/models.py:283
+msgid "to (matched transfer's contractor's rel)"
+msgstr "do (relacja kontrahenta dopasowanego przelewu)"
+
+#: kw/models.py:286 kw/models.py:287
+msgid "matched transfer's contractor"
+msgstr "kontrahent dopasowanego przelewu"
+
+#: kw/templates/admin/base.html:39
+msgid "Welcome,"
+msgstr "Witaj,"
+
+#: kw/templates/admin/base.html:44
+msgid "View site"
+msgstr "Pokaż stronę"
+
+#: kw/templates/admin/base.html:49
+msgid "Documentation"
+msgstr "Dokumentacja"
+
+#: kw/templates/admin/base.html:53
+msgid "Change password"
+msgstr "Zmień hasło"
+
+#: kw/templates/admin/base.html:55
+msgid "Log out"
+msgstr "Wyloguj się"
+
+#: kw/templates/admin/base.html:65
+msgid "Home"
+msgstr "Początek"
+
+#~ msgid "private"
+#~ msgstr "prywatny"

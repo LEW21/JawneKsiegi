@@ -1,0 +1,188 @@
+{% extends "kw/base.html" %}
+
+{% load money %}
+
+{% block title %}{% if account %}{{account.num_id}}. {{account.pub_name}}{% else %}{{block.super}}{% endif %}{% endblock %}
+
+{% block top %}
+	{% if account %}
+		<h1>{{account.num_id}}. {{account.pub_name}}
+		{% if account.facebook_id and account.facebook_public %}
+		<a href="https://www.facebook.com/profile.php?id={{account.facebook_id}}"><img src="http://graph.facebook.com/{{account.facebook_id}}/picture"></a>
+		{% endif %}</h1>
+		<dl class="dl-horizontal" style="overflow: hidden;">
+			{% if account.parent_id %}
+				<dt>Konto syntetyczne</dt>
+				<dd><a href="{{account.parent.url}}">{{account.parent.num_id}}. {{account.parent.pub_name}}</a></dd>
+			{% endif %}
+			{% if account.address and account.address_public %}
+				<dt>Adres</dt>
+				<dd>{{account.address}}</dd>
+			{% elif account.locality and account.locality_public %}
+				<dt>Miejscowość</dt>
+				<dd>{{account.locality}}</dd>
+			{% endif %}
+			{% if account.bank_account and account.bank_account_public %}
+				<dt>Nr konta bankowego</dt>
+				<dd>{{account.bank_account}}</dd>
+			{% endif %}
+		</dl>
+	{% else %}
+		<h1>{{block.super}}</h1>
+	{% endif %}
+{% endblock top %}
+
+{% block content %}
+
+{% if accounts or account.children %}
+<h2>{% if accounts %}Konta{% else %}Subkonta{% endif %}</h2>
+<div class="unit">
+<table class="table" id="accounts">
+	<thead>
+		<tr>
+			<th class="num-id">ID</th>
+			<th>Nazwa</th>
+			<th class="money">Obroty Wn</th>
+			<th class="money">Obroty Ma</th>
+			<th class="money">Saldo Wn</th>
+			<th class="money">Saldo Ma</th>
+		</tr>
+	</thead>
+	{% for t in accounts %}
+		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% endif %}{% endif %} level{{t.level}}"{% if t.level > 0 %} style="display: none;"{%endif%}>
+			<td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
+			<td>{{t.pub_name}}</td>
+			<td class="turnover debit">{{t.turnover.debit|money}}</td>
+			<td class="turnover credit">{{t.turnover.credit|money}}</td>
+			<td class="balance debit">{{t.turnover.balance|debit}}</td>
+			<td class="balance credit">{{t.turnover.balance|credit}}</td>
+		</tr>
+	{% endfor %}
+	{% for t in account.children %}
+		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% endif %}{% endif %} level{{t.level}}"{% if t.level > account.levelP1 %} style="display: none;"{%endif%}>
+			<td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
+			<td>{{t.pub_name}}</td>
+			<td class="turnover debit">{{t.turnover.debit|money}}</td>
+			<td class="turnover credit">{{t.turnover.credit|money}}</td>
+			<td class="balance debit">{{t.turnover.balance|debit}}</td>
+			<td class="balance credit">{{t.turnover.balance|credit}}</td>
+		</tr>
+	{% endfor %}
+</table>
+</div>
+
+<script>
+$("#accounts tr").each(function(){
+	var children = $("#accounts tr[data-parent=" + $(this).data("id") + "]");
+	if (!children.length)
+		$(this).addClass("empty");
+})
+
+function acc_parent(acc)
+{
+	var p = $("#accounts tr[data-id=" + $(acc).data("parent") + "]");
+	if (!p.length)
+		return null;
+	return p;
+}
+
+$("#accounts tr").click(function(){
+	$(this).toggleClass("expanded");
+
+	$("#accounts tr").each(function(){
+		var p = $(this);
+		var visible = true;
+		while (p = acc_parent(p))
+			if (!p.hasClass("expanded"))
+				visible = false;
+		if (visible)
+			$(this).show();
+		else
+			$(this).hide();
+	});
+});
+</script>
+{% endif %}
+
+{% if account.relations_from.all %}
+<h2>Powiązane konta</h2>
+<dl class="dl-horizontal">
+	{% for r in account.relations_from.all %}
+		<dt>{{r.type|capfirst}}</dt>
+		<dd><a href="{{r.dst.url}}">{{r.dst.pub_name}}</a></dd>
+	{% endfor %}
+</dl>
+{% endif %}
+
+{% if transfers %}
+<h2>Przelewy na rachunku</h2>
+<div class="unit">
+<table class="table nomargin">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Data</th>
+			<th>Kontrahent</th>
+			<th>Tytuł</th>
+			<th style="text-align: right;">Kwota</th>
+			<th style="text-align: right;">Saldo</th>
+		</tr>
+	</thead>
+	{% for t in transfers %}
+		<tr class="{% if t.amount > 0 %}positive{% else %}negative{% endif %}">
+			<td><a href="{{t.issuer.url}}dokumenty/{{t.number_dashed}}">{{t.number}}</a></td>
+			<td style="white-space: nowrap">{{t.date}}</td>
+			<td><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
+			<td>{{t.title}}</td>
+			<td style="text-align: right;">{{t.amount|money_sign}}</td>
+			<td style="text-align: right;">{{t.balance|money}}</td>
+		</tr>
+	{% endfor %}
+	<tfoot>
+		<tr>
+			<td colspan="5" style="text-align: right;"><strong>Aktualne saldo:</strong></td>
+			<td style="text-align: right;"><strong>{{transfers.balance|money_sign}}</strong></td>
+		</tr>
+	</tfoot>
+</table>
+</div>
+{% endif %}
+
+{% if events %}
+<h2>Zdarzenia</h2>
+<div class="unit">
+<table class="table nomargin">
+	<thead>
+		<tr>
+			<th>Dokument</th>
+			<th>Data</th>
+			<th>Kontrahent</th>
+			<th style="text-align: right;">Kwota Wn</th>
+			<th style="text-align: right;">Kwota Ma</th>
+			<th style="text-align: right;">Saldo Wn</th>
+			<th style="text-align: right;">Saldo Ma</th>
+		</tr>
+	</thead>
+	{% for t in events %}
+		<tr class="{% if account.is_nominal %}{% if t.amount < 0 %}positive{% elif t.amount > 0 %}negative{% endif %}{% else %}{% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% endif %}{% endif %}">
+			<td><a href="{{t.doc.issuer.url}}dokumenty/{{t.doc.number_dashed}}">{{t.doc}}</a></td>
+			<td>{{t.doc.date}}</td>
+			<td><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
+			<td style="text-align: right;">{{t.amount|debit}}</td>
+			<td style="text-align: right;">{{t.amount|credit}}</td>
+			<td style="text-align: right;">{{t.balance|debit}}</td>
+			<td style="text-align: right;">{{t.balance|credit}}</td>
+		</tr>
+	{% endfor %}
+	<tfoot>
+		<tr>
+			<td colspan="5" style="text-align: right;"><strong>Aktualne saldo:</strong></td>
+			<td style="text-align: right;"><strong>{{events.balance|debit}}</strong></td>
+			<td style="text-align: right;"><strong>{{events.balance|credit}}</strong></td>
+		</tr>
+	</tfoot>
+</table>
+</div>
+{% endif %}
+
+{% endblock %}
