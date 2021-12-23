@@ -1,7 +1,7 @@
 asgiref==3.4.1
 dj-database-url==0.5.0
 dj12==0.3.0
-Django==3.2.10
+Django==4.0
 django-cache-url==3.2.3
 pytz==2021.3
 six==1.16.0
