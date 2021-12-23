@@ -1,5 +1,5 @@
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "local.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jawneksiegi.settings")
 import django
 django.setup()
 

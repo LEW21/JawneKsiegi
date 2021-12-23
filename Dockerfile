@@ -1,9 +1,4 @@
-FROM debian:stretch
-
-RUN apt-get update
-
-RUN apt-get install -y python3 python3-pip
-RUN apt-get install -y git sassc
+FROM python:3.10.1-alpine3.15
 
 RUN ln -s python3 /usr/bin/python && ln -s pip3 /usr/bin/pip
 WORKDIR /app
@@ -13,7 +8,8 @@ RUN pip install -r requirements.txt
 
 ENV PYTHONPATH /app
 ADD kw /app/kw
-ADD vagla /app/vagla
-ENV DJANGO_SETTINGS_MODULE vagla.settings
+ADD jawneksiegi /app/jawneksiegi
+ENV DJANGO_SETTINGS_MODULE jawneksiegi.settings
 
-ENTRYPOINT ["gunicorn", "vagla.wsgi", "-k", "gevent", "-b", "0.0.0.0:80"]
+ENTRYPOINT ["gunicorn", "jawneksiegi.wsgi", "-k", "gevent", "-b", "0.0.0.0:80"]
+EXPOSE 80

@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import uuid
 
 class Account(models.Model):
@@ -24,7 +24,7 @@ class Account(models.Model):
 
 	@property
 	def url(self):
-		from django.core.urlresolvers import reverse
+		from django.urls import reverse
 		return reverse('account', args=[str(self.num_id)])
 
 	def get_absolute_url(self):
@@ -114,9 +114,9 @@ class AccountRelation(models.Model):
 		verbose_name = _('account relation')
 		verbose_name_plural = _('account relations')
 
-	src = models.ForeignKey(Account, verbose_name=_("from"), related_name="relations_from")
-	type = models.ForeignKey(AccountRelationType, verbose_name=_("type"))
-	dst = models.ForeignKey(Account, verbose_name=_("to"), related_name="relations_to")
+	src = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("from"), related_name="relations_from")
+	type = models.ForeignKey(AccountRelationType, on_delete=models.PROTECT, verbose_name=_("type"))
+	dst = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("to"), related_name="relations_to")
 
 	def __str__(self):
 		return str(self.src) + " =" + str(self.type) + "> " + str(self.dst)
@@ -167,13 +167,13 @@ class Document(models.Model):
 	date = models.DateField(_("date"))
 	date_posted = models.DateField(_("date posted"), auto_now_add=True)
 	date_posted.editable = True
-	type = models.ForeignKey(DocumentType, verbose_name=_("type"))
-	issuer = models.ForeignKey(Account, verbose_name=_("issuer"), related_name="documents")
+	type = models.ForeignKey(DocumentType, on_delete=models.PROTECT, verbose_name=_("type"))
+	issuer = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("issuer"), related_name="documents")
 	number = models.CharField(_("number"), max_length=50)
 
 	@property
 	def url(self):
-		from django.core.urlresolvers import reverse
+		from django.urls import reverse
 		return reverse('doc', args=[self.issuer.num_id, self.number.replace("/", "-")])
 
 	def get_absolute_url(self):
@@ -191,7 +191,7 @@ class BankTransfer(Document):
 		verbose_name = _('bank transfer')
 		verbose_name_plural = _('bank transfers')
 
-	contractor = models.ForeignKey(Account, verbose_name=_("contractor"), related_name="foreign_transfers", limit_choices_to=~models.Q(num_id__startswith=4))
+	contractor = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("contractor"), related_name="foreign_transfers", limit_choices_to=~models.Q(num_id__startswith=4))
 	amount = models.IntegerField(_("amount")) # * 0.01 PLN
 	title = models.CharField(_("title"), max_length=200)
 
@@ -205,8 +205,8 @@ class Invoice(Document):
 		verbose_name_plural = _('invoices')
 
 	date_of_sale = models.DateField(_("date of sale"))
-	seller = models.ForeignKey(Account,verbose_name= _("seller"), related_name="sold")
-	buyer = models.ForeignKey(Account, verbose_name=_("buyer"), related_name="bought", default=1)
+	seller = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name= _("seller"), related_name="sold")
+	buyer = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("buyer"), related_name="bought", default=1)
 	pit_amount = models.IntegerField(_("PIT amount"), default=0)
 
 	@property
@@ -218,9 +218,9 @@ class InvoiceLine(models.Model):
 		verbose_name = _('invoice line')
 		verbose_name_plural = _('invoice lines')
 
-	invoice = models.ForeignKey(Invoice, verbose_name=_("invoice"), related_name="lines")
+	invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, verbose_name=_("invoice"), related_name="lines")
 	number = models.IntegerField(_("number"))
-	account = models.ForeignKey(Account, verbose_name=_("account"))
+	account = models.ForeignKey(Account, on_delete=models.PROTECT, verbose_name=_("account"))
 	amount = models.IntegerField(_("amount"))
 
 	def __str__(self):
@@ -248,7 +248,7 @@ class Attachment(models.Model):
 		verbose_name = _('attachment')
 		verbose_name_plural = _('attachments')
 
-	doc = models.ForeignKey(Document, verbose_name=_("document"), related_name="files")
+	doc = models.ForeignKey(Document, on_delete=models.CASCADE, verbose_name=_("document"), related_name="files")
 	name = models.CharField(_("name"), max_length=100)
 	file = models.FileField(_("file"), upload_to=upload_to)
 	public = models.BooleanField(_("public"), default=True)
@@ -273,7 +273,7 @@ class BankTransferRule(models.Model):
 	match_title = models.CharField(_("match title"), default="%", max_length=200)
 	min_amount = models.IntegerField(_("min amount"), blank=True, null=True)
 	max_amount = models.IntegerField(_("max amount"), blank=True, null=True)
-	match_contractor = models.ForeignKey(Account, verbose_name=_("match contractor"), blank=True, null=True, related_name="+")
+	match_contractor = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("match contractor"), blank=True, null=True, related_name="+")
 
 	def __str__(self):
 		ret = self.match_title
@@ -290,12 +290,12 @@ class BankTransferRuleEvent(models.Model):
 		verbose_name = _('generated event')
 		verbose_name_plural = _('generated events')
 
-	rule = models.ForeignKey(BankTransferRule, verbose_name=_("rule"), related_name="events")
+	rule = models.ForeignKey(BankTransferRule, on_delete=models.CASCADE, verbose_name=_("rule"), related_name="events")
 	# blank = contractor
-	src = models.ForeignKey(Account, verbose_name=_("from (preset)"), related_name="+", blank=True, null=True)
-	src_rel = models.ForeignKey(AccountRelationType, verbose_name=_("from (matched transfer's contractor's rel)"), blank=True, null=True, related_name="+")
-	dst = models.ForeignKey(Account, verbose_name=_("to (preset)"), related_name="+", blank=True, null=True)
-	dst_rel = models.ForeignKey(AccountRelationType, verbose_name=_("to (matched transfer's contractor's rel)"), blank=True, null=True, related_name="+")
+	src = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("from (preset)"), related_name="+", blank=True, null=True)
+	src_rel = models.ForeignKey(AccountRelationType, on_delete=models.CASCADE, verbose_name=_("from (matched transfer's contractor's rel)"), blank=True, null=True, related_name="+")
+	dst = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("to (preset)"), related_name="+", blank=True, null=True)
+	dst_rel = models.ForeignKey(AccountRelationType, on_delete=models.CASCADE, verbose_name=_("to (matched transfer's contractor's rel)"), blank=True, null=True, related_name="+")
 
 	def __str__(self):
 		src = str(self.src) if self.src else str(_("matched transfer's contractor"))

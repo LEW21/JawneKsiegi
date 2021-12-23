@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import models, migrations
 
 class Migration(migrations.Migration):
@@ -15,13 +12,13 @@ SELECT t.document_ptr_id as t_id, min(r.priority) as r_priority
 FROM kw_banktransfer t
 JOIN kw_banktransferrule r
 	ON t.title like r.match_title
-	AND CASE WHEN r.min_amount IS NOT NULL THEN t.amount >= r.min_amount ELSE 1 END
-	AND CASE WHEN r.max_amount IS NOT NULL THEN t.amount <= r.max_amount ELSE 1 END
-	AND CASE WHEN r.match_contractor_id IS NOT NULL THEN t.contractor_id = r.match_contractor_id ELSE 1 END
+	AND CASE WHEN r.min_amount IS NOT NULL THEN t.amount >= r.min_amount ELSE true END
+	AND CASE WHEN r.max_amount IS NOT NULL THEN t.amount <= r.max_amount ELSE true END
+	AND CASE WHEN r.match_contractor_id IS NOT NULL THEN t.contractor_id = r.match_contractor_id ELSE true END
 GROUP BY t.document_ptr_id;""",
 
 """CREATE VIEW kw_event_banktransfer AS
-SELECT t.document_ptr_id, coalesce(sr.dst_id, e.src_id, t.contractor_id), coalesce(dr.dst_id, e.dst_id, t.contractor_id), abs(t.amount)
+SELECT t.document_ptr_id, coalesce(sr.dst_id, e.src_id, t.contractor_id) as src_id, coalesce(dr.dst_id, e.dst_id, t.contractor_id) as dst_id, abs(t.amount) as amount
 FROM kw_event_banktransfer_matches m
 LEFT JOIN kw_banktransfer t ON m.t_id = t.document_ptr_id
 LEFT JOIN kw_banktransferrule r ON m.r_priority = r.priority
@@ -57,7 +54,7 @@ UNION ALL
 
 SELECT i.document_ptr_id, us.id, i.seller_id, i.pit_amount
 FROM kw_invoice i
-LEFT JOIN kw_account us ON us.text_id = "US"
+LEFT JOIN kw_account us ON shortcut = 'US'
 WHERE i.pit_amount > 0;""",
 
 """CREATE VIEW kw_event AS
@@ -67,16 +64,18 @@ LEFT JOIN kw_document d ON d.id = e.doc_id
 ORDER BY d.date ASC, e.doc_id ASC, e.src_id ASC, e.dst_id ASC, e.amount ASC;""",
 
 """CREATE VIEW kw_turnover AS
-SELECT a.id, ifnull(Wn, 0) as debit, ifnull(Ma, 0) as credit, ifnull(Wn, 0)-ifnull(Ma, 0) as balance
+SELECT a.id, coalesce(Wn, 0) as debit, coalesce(Ma, 0) as credit, coalesce(Wn, 0)-coalesce(Ma, 0) as balance
 FROM kw_account a
 LEFT JOIN (
-        SELECT k.id as acc, sum(dst.amount) as Wn FROM kw_account k
-        LEFT JOIN kw_event dst ON k.id = dst.dst_id
-        GROUP BY k.id) wn ON wn.acc = a.id
+		SELECT k.id as acc, sum(dst.amount) as Wn FROM kw_account k
+		LEFT JOIN kw_account sub ON (sub.id = k.id OR sub.num_id LIKE k.num_id||'-%')
+		LEFT JOIN kw_event dst ON sub.id = dst.dst_id
+		GROUP BY k.id) wn ON wn.acc = a.id
 LEFT JOIN (
-        SELECT k.id as acc, sum(src.amount) as Ma FROM kw_account k
-        LEFT JOIN kw_event src ON k.id = src.src_id
-        GROUP BY k.id) ma ON ma.acc = a.id
+		SELECT k.id as acc, sum(src.amount) as Ma FROM kw_account k
+		LEFT JOIN kw_account sub ON (sub.id = k.id OR sub.num_id LIKE k.num_id||'-%')
+		LEFT JOIN kw_event src ON sub.id = src.src_id
+		GROUP BY k.id) ma ON ma.acc = a.id
 ORDER BY id;""",
 	]
 
