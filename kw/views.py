@@ -15,12 +15,12 @@ def accounts(request):
 class obj_list(list):
 	pass
 
-def account(request, id):
+def account(request, acc_id):
 	try:
-		a = Account.objects.get(num_id=id)
+		a = Account.objects.get(num_id=acc_id)
 	except Account.DoesNotExist:
 		try:
-			a = Account.objects.get(shortcut=id)
+			a = Account.objects.get(shortcut=acc_id)
 		except Account.DoesNotExist:
 			raise Http404
 		return redirect("account", a.num_id, permanent=True)
@@ -47,7 +47,7 @@ def account(request, id):
 		'events': ev,
 	})
 
-def doc(request, acc_id, id):
+def doc(request, acc_id, doc_id):
 	try:
 		a = Account.objects.get(num_id=acc_id)
 	except Account.DoesNotExist:
@@ -57,7 +57,11 @@ def doc(request, acc_id, id):
 			raise Http404
 		return redirect("account", a.num_id, permanent=True)
 
-	d = a.documents.select_related("banktransfer__issuer", "invoice__issuer", "banktransfer__type", "invoice__type", "banktransfer__contractor", "invoice__seller", "invoice__buyer").prefetch_related(Prefetch("banktransfer__events", queryset = Event.objects.select_related("src", "dst"))).prefetch_related("banktransfer__files").prefetch_related(Prefetch("invoice__events", queryset = Event.objects.select_related("src", "dst"))).prefetch_related("invoice__files").get(number=id.replace("-", "/"))
+	try:
+		d = a.documents.select_related("banktransfer__issuer", "invoice__issuer", "banktransfer__type", "invoice__type", "banktransfer__contractor", "invoice__seller", "invoice__buyer").prefetch_related(Prefetch("banktransfer__events", queryset = Event.objects.select_related("src", "dst"))).prefetch_related("banktransfer__files").prefetch_related(Prefetch("invoice__events", queryset = Event.objects.select_related("src", "dst"))).prefetch_related("invoice__files").get(number=doc_id.replace("-", "/"))
+	except Document.DoesNotExist:
+		raise Http404
+
 	try:
 		d = d.banktransfer
 	except:
@@ -66,18 +70,3 @@ def doc(request, acc_id, id):
 	return render(request, 'kw/doc.html', {
 		'doc': d
 	})
-
-def attachment(request, acc_id, doc_id, name):
-	try:
-		a = Account.objects.get(num_id=acc_id)
-	except Account.DoesNotExist:
-		try:
-			a = Account.objects.get(shortcut=acc_id)
-		except Account.DoesNotExist:
-			raise Http404
-		return redirect("account", a.num_id, permanent=True)
-
-	d = a.documents.get(number=doc_id.replace("-", "/"))
-	f = d.files.get(name=name, public=True)
-
-	return redirect(f.url)
