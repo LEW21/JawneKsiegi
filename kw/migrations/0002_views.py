@@ -58,7 +58,7 @@ LEFT JOIN kw_account us ON shortcut = 'US'
 WHERE i.pit_amount > 0;""",
 
 """CREATE VIEW kw_event AS
-SELECT (((e.doc_id * 1000 + e.src_id) * 1000 + e.dst_id) * 100000 + e.amount) as id, e.doc_id, e.src_id, e.dst_id, e.amount
+SELECT (((cast(e.doc_id as numeric) * 1000 + e.src_id) * 1000 + e.dst_id) * 100000 + e.amount) as id, e.doc_id, e.src_id, e.dst_id, e.amount
 FROM kw_event_all e
 LEFT JOIN kw_document d ON d.id = e.doc_id
 ORDER BY d.date ASC, e.doc_id ASC, e.src_id ASC, e.dst_id ASC, e.amount ASC;""",
