@@ -39,12 +39,12 @@ def account(request, acc_id):
 	for e in ev:
 		balance += e.amount
 		e.balance = balance
-	ev.balance = balance
 
 	return render(request, 'kw/index.html', {
 		'account': a,
 		'transfers': tr,
 		'events': ev,
+		'balance': balance,
 	})
 
 def doc(request, acc_id, doc_id):
@@ -65,7 +65,10 @@ def doc(request, acc_id, doc_id):
 	try:
 		d = d.banktransfer
 	except:
-		d = d.invoice
+		try:
+			d = d.invoice
+		except:
+			pass
 
 	return render(request, 'kw/doc.html', {
 		'doc': d

@@ -8,5 +8,5 @@ urlpatterns = [
 	path('', views.index, name='index'),
 	path('konta/', views.accounts, name='accounts'),
 	path('konta/<slug:acc_id>/', views.account, name='account'),
-	path('konta/<slug:acc_id>/dokumenty/<slug:doc_id>/', views.doc, name='doc'),
+	path('konta/<slug:acc_id>/dokumenty/<doc_id>/', views.doc, name='doc'),
 ]

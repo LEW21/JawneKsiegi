@@ -110,7 +110,10 @@ tr.negative.nominal .balance.debit {
   color: {{color1}}; }
 
 #accounts .num-id, #accounts .money {
-  width: 100px; }
+  width: 150px; }
+
+#accounts .money {
+  text-align: right; }
 
 #accounts tbody tr:not(.empty) > .num-id::before {
   content: "▶"; }

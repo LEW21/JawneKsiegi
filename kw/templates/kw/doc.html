@@ -36,8 +36,10 @@
 		<dd><a href="{{doc.buyer.url}}">{{doc.buyer.pub_name}}</a></dd>
 	{% endif %}
 
-	<dt>Kwota</dt>
-	<dd>{{doc.amount|money}} PLN</dd>
+	{% if doc.amount %}
+		<dt>Kwota</dt>
+		<dd>{{doc.amount|money}} PLN</dd>
+	{% endif %}
 
 	{% if doc.pit_amount > 0 %}
 		<dt>Kwota PIT</dt>
@@ -78,7 +80,7 @@
 			<th>Data</th>
 			<th>Wn</th>
 			<th>Ma</th>
-			<th>Kwota</th>
+			<th style="text-align: right;">Kwota</th>
 		</tr>
 	</thead>
 	{% for t in doc.events.all %}
@@ -86,7 +88,7 @@
 			<td>{{t.doc.date}}</td>
 			<td><a href="{{t.dst.url}}" title="{{t.dst.pub_name}}">{{t.dst.num_id}}</a></td>
 			<td><a href="{{t.src.url}}" title="{{t.src.pub_name}}">{{t.src.num_id}}</a></td>
-			<td>{{t.amount|money}}</td>
+			<td style="text-align: right;">{{t.amount|money}}</td>
 		</tr>
 	{% endfor %}
 </table>

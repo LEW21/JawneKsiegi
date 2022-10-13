@@ -37,20 +37,8 @@ class BankTransferAdmin(admin.ModelAdmin):
 		AttachmentInline,
 	]
 
-class BankTransferRuleEventInline(admin.TabularInline):
-	model = BankTransferRuleEvent
-	extra = 1
-
-class BankTransferRuleAdmin(admin.ModelAdmin):
-	list_display = ("__str__", "match_title", "min_amount", "max_amount", "match_contractor", "priority")
-	list_editable = ("match_title", "min_amount", "max_amount", "match_contractor", "priority")
-	inlines = [
-		BankTransferRuleEventInline,
-	]
-
 admin.site.register(Account, AccountAdmin)
 admin.site.register(AccountRelationType)
 admin.site.register(DocumentType)
 admin.site.register(BankTransfer, BankTransferAdmin)
 admin.site.register(Invoice, InvoiceAdmin)
-admin.site.register(BankTransferRule, BankTransferRuleAdmin)

@@ -70,7 +70,7 @@ class Account(models.Model):
 
 	@property
 	def is_nominal(self):
-		return self.num_id >= "300"
+		return self.num_id >= "400"
 
 	@property
 	def shortname(self):
@@ -97,6 +97,7 @@ class Account(models.Model):
 				e.account = e.dst
 				e.contractor = e.src
 
+		ev = sorted(ev, key=lambda e: (e.doc.date, -e.amount))
 		return ev
 
 class AccountRelationType(models.Model):
@@ -164,9 +165,9 @@ class Document(models.Model):
 		unique_together = (("issuer", "number"),)
 		ordering = ('issuer', 'number')
 
-	date = models.DateField(_("date"))
+	date = models.DateField(_("tax point date"))
 	date_posted = models.DateField(_("date posted"), auto_now_add=True)
-	date_posted.editable = True
+	#date_posted.editable = True
 	type = models.ForeignKey(DocumentType, on_delete=models.PROTECT, verbose_name=_("type"))
 	issuer = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("issuer"), related_name="documents")
 	number = models.CharField(_("number"), max_length=50)
@@ -230,8 +231,8 @@ class Event(models.Model):
 	class Meta:
 		verbose_name = _('event')
 		verbose_name_plural = _('events')
-		managed = False
 
+	id = models.CharField(max_length=100, primary_key=True)
 	doc = models.ForeignKey(Document, verbose_name=_("document"), related_name="events", on_delete=models.DO_NOTHING)
 	amount = models.IntegerField(_("amount")) # * 0.01 PLN
 	src = models.ForeignKey(Account, verbose_name=_("from"), related_name="events_from", on_delete=models.DO_NOTHING)
@@ -262,42 +263,3 @@ class Attachment(models.Model):
 
 	def __str__(self):
 		return str(self.doc) + " - " + self.name
-
-class BankTransferRule(models.Model):
-	class Meta:
-		verbose_name = _('bank transfer interpretation rule')
-		verbose_name_plural = _('bank transfer interpretation rules')
-		ordering = ['priority']
-
-	priority = models.IntegerField(_("priority"), unique=True)
-	match_title = models.CharField(_("match title"), default="%", max_length=200)
-	min_amount = models.IntegerField(_("min amount"), blank=True, null=True)
-	max_amount = models.IntegerField(_("max amount"), blank=True, null=True)
-	match_contractor = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("match contractor"), blank=True, null=True, related_name="+")
-
-	def __str__(self):
-		ret = self.match_title
-		if self.min_amount is not None:
-			ret += ", " + str(_("amount")) + " >= " + str(self.min_amount)
-		if self.max_amount is not None:
-			ret += ", " + str(_("amount")) + " <= " + str(self.max_amount)
-		if self.match_contractor is not None:
-			ret += ", " + str(self.match_contractor)
-		return ret
-
-class BankTransferRuleEvent(models.Model):
-	class Meta:
-		verbose_name = _('generated event')
-		verbose_name_plural = _('generated events')
-
-	rule = models.ForeignKey(BankTransferRule, on_delete=models.CASCADE, verbose_name=_("rule"), related_name="events")
-	# blank = contractor
-	src = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("from (preset)"), related_name="+", blank=True, null=True)
-	src_rel = models.ForeignKey(AccountRelationType, on_delete=models.CASCADE, verbose_name=_("from (matched transfer's contractor's rel)"), blank=True, null=True, related_name="+")
-	dst = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("to (preset)"), related_name="+", blank=True, null=True)
-	dst_rel = models.ForeignKey(AccountRelationType, on_delete=models.CASCADE, verbose_name=_("to (matched transfer's contractor's rel)"), blank=True, null=True, related_name="+")
-
-	def __str__(self):
-		src = str(self.src) if self.src else str(_("matched transfer's contractor"))
-		dst = str(self.dst) if self.dst else str(_("matched transfer's contractor"))
-		return src + " => " + dst
