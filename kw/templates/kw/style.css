@@ -89,6 +89,9 @@ tbody td {
 tbody .turnover, tbody .balance {
   text-align: right; }
 
+tr.zero td, tr.zero a {
+  color: #bbb;
+}
 tr.positive:not(.nominal) .balance.debit {
   color: #40bf80; }
 

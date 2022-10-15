@@ -49,7 +49,7 @@
 		</tr>
 	</thead>
 	{% for t in accounts %}
-		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% endif %}{% endif %} level{{t.level}}"{% if t.level > 0 %} style="display: none;"{%endif%}>
+		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% else %}zero{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% else %}zero{% endif %}{% endif %} level{{t.level}}"{% if t.level > 0 %} style="display: none;"{%endif%}>
 			<td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
 			<td>{{t.pub_name}}</td>
 			<td class="turnover debit">{{t.turnover.debit|money}}</td>
@@ -59,7 +59,7 @@
 		</tr>
 	{% endfor %}
 	{% for t in account.children %}
-		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% endif %}{% endif %} level{{t.level}}"{% if t.level > account.levelP1 %} style="display: none;"{%endif%}>
+		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% else %}zero{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% else %}zero{% endif %}{% endif %} level{{t.level}}"{% if t.level > account.levelP1 %} style="display: none;"{%endif%}>
 			<td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
 			<td>{{t.pub_name}}</td>
 			<td class="turnover debit">{{t.turnover.debit|money}}</td>
