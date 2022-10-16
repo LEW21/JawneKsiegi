@@ -7,6 +7,6 @@ from . import views
 urlpatterns = [
 	path('', views.index, name='index'),
 	path('konta/', views.accounts, name='accounts'),
-	path('konta/<slug:acc_id>/', views.account, name='account'),
-	path('konta/<slug:acc_id>/dokumenty/<doc_id>/', views.doc, name='doc'),
+	path('konta/<acc_id>/', views.account, name='account'),
+	path('konta/<acc_id>/dokumenty/<doc_id>/', views.doc, name='doc'),
 ]

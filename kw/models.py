@@ -86,7 +86,7 @@ class Account(models.Model):
 
 	@property
 	def events(self):
-		ev = Event.objects.filter(models.Q(src=self) | models.Q(dst=self)).select_related("src", "dst", "doc", "doc__issuer", "doc__type")
+		ev = Event.objects.filter(models.Q(src=self) | models.Q(dst=self)).select_related("src", "dst", "doc", "doc__type")
 
 		for e in ev:
 			if e.src == self:
@@ -97,7 +97,6 @@ class Account(models.Model):
 				e.account = e.dst
 				e.contractor = e.src
 
-		ev = sorted(ev, key=lambda e: (e.doc.date, -e.amount))
 		return ev
 
 class AccountRelationType(models.Model):
@@ -162,20 +161,23 @@ class Document(models.Model):
 	class Meta:
 		verbose_name = _('document')
 		verbose_name_plural = _('documents')
-		unique_together = (("issuer", "number"),)
-		ordering = ('issuer', 'number')
+		unique_together = (("issuer_name", "number"),)
+		ordering = ('issuer_name', 'number')
 
-	date = models.DateField(_("tax point date"))
+	date = models.DateField(_("date"))
 	date_posted = models.DateField(_("date posted"), auto_now_add=True)
 	#date_posted.editable = True
 	type = models.ForeignKey(DocumentType, on_delete=models.PROTECT, verbose_name=_("type"))
-	issuer = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("issuer"), related_name="documents")
+	issuer_name = models.CharField(_('issuer name'), max_length=100)
 	number = models.CharField(_("number"), max_length=50)
 
 	@property
 	def url(self):
 		from django.urls import reverse
-		return reverse('doc', args=[self.issuer.num_id, self.number.replace("/", "-")])
+		try:
+			return reverse('doc', args=[self.issuer_name, self.number.replace("/", "-")])
+		except:
+			return ""
 
 	def get_absolute_url(self):
 		return self.url
@@ -185,14 +187,13 @@ class Document(models.Model):
 		return self.number.replace("/", "-")
 
 	def __str__(self):
-		return self.type.name.capitalize() + " " + self.issuer.shortname + " " + self.number
+		return self.type.name.capitalize() + " " + self.issuer_name + " " + self.number
 
 class BankTransfer(Document):
 	class Meta:
 		verbose_name = _('bank transfer')
 		verbose_name_plural = _('bank transfers')
 
-	contractor = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("contractor"), related_name="foreign_transfers", limit_choices_to=~models.Q(num_id__startswith=4))
 	amount = models.IntegerField(_("amount")) # * 0.01 PLN
 	title = models.CharField(_("title"), max_length=200)
 
@@ -231,12 +232,15 @@ class Event(models.Model):
 	class Meta:
 		verbose_name = _('event')
 		verbose_name_plural = _('events')
+		ordering = ('date','-amount','title')
 
 	id = models.CharField(max_length=100, primary_key=True)
+	date = models.DateField(_("date"))
 	doc = models.ForeignKey(Document, verbose_name=_("document"), related_name="events", on_delete=models.DO_NOTHING)
 	amount = models.IntegerField(_("amount")) # * 0.01 PLN
 	src = models.ForeignKey(Account, verbose_name=_("from"), related_name="events_from", on_delete=models.DO_NOTHING)
 	dst = models.ForeignKey(Account, verbose_name=_("to"), related_name="events_to", on_delete=models.DO_NOTHING)
+	title = models.TextField(null=True)
 
 	def __str__(self):
 		return str(self.doc.date) + ": " + str(self.src) + " -> " + str(self.dst) + ": " + str(self.amount)

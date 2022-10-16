@@ -47,9 +47,10 @@ def load_journal():
 	module_order = {
 		'patronite': 1,
 		'zrzutka': 2,
-		'paribas': 3,
-		'wydatki': 4,
-		'zamkniecie': 5,
+		'payu': 3,
+		'paribas': 4,
+		'wydatki': 5,
+		'pk': 6,
 	}
 
 	return sorted(journal, key=lambda entry: (entry.date, entry.us, module_order[entry.module], -entry.amount_pln))
@@ -57,59 +58,60 @@ def load_journal():
 
 journal = load_journal()
 
+Event.objects.all().delete()
+Document.objects.all().delete()
+
+for acc in Account.objects.filter(num_id__startswith="200-").order_by('-num_id'):
+	try:
+		acc.delete()
+	except:
+		pass
+
 accounts = {acc.num_id: acc for acc in Account.objects.all()}
 
-def account(name):
-	num_id = name.replace('-', '').replace('/', '-')
+names = {}
+
+def account(id):
+	if '/' in id:
+		account(id.rsplit('/', 1)[0])
+
+	num_id = id.replace('-', '').replace('/', '-')
 
 	try:
 		return accounts[num_id]
 	except KeyError:
-		acc, created = Account.objects.get_or_create(num_id = num_id, defaults=dict(
-			name = name,
+		acc, created = Account.objects.get_or_create(num_id = num_id, defaults = dict(
+			name = names.get(id, id.rsplit('/')[-1]),
 		))
 		return acc
-
-Event.objects.all().delete()
-Document.objects.all().delete()
 
 docs = groupby(sorted(journal, key=lambda e: e.doc_id), key=lambda e: (e.us, e.doc_id))
 
 for (us, doc_id), entries in docs:
 	entries = list(entries)
 
-	if us.startswith('1'):
-		d, created = BankTransfer.objects.get_or_create(
-			issuer = account(us),
-			number = doc_id.replace('-', '/'),
-			defaults = dict(
-				date = entries[0].date,
-				contractor = Account.objects.get(num_id = '999'),
-				title = entries[0].doc_title,
-				amount = sum(e.amount_pln for e in entries) * 100,
-			),
-		)
-	else:
-		d, created = Document.objects.get_or_create(
-			issuer = account(us),
-			number = doc_id.replace('-', '/'),
+	d, created = Document.objects.get_or_create(
+		issuer_name = entries[0].doc_issuer,
+		number = doc_id.replace('-', '/'),
+		defaults = dict(
 			type = DocumentType.get('d'),
-			defaults = dict(
-				date = entries[0].date,
-			),
-		)
+			date = entries[0].date,
+		),
+	)
 
 for entry in journal:
 	src_id = entry.them if entry.amount_pln >= 0 else entry.us
 	dst_id = entry.us if entry.amount_pln >= 0 else entry.them
 
-	doc = Document.objects.get(issuer = account(entry.us), number = entry.doc_id.replace('-', '/'))
+	doc = Document.objects.get(issuer_name = entry.doc_issuer, number = entry.doc_id.replace('-', '/'))
 
 	e = Event(
 		id = f"{entry.module}#{entry.id}",
+		date = entry.date,
 		doc = doc,
 		src = account(src_id),
 		dst = account(dst_id),
 		amount = int((entry.amount_pln if entry.amount_pln >= 0 else -entry.amount_pln) * 100),
+		title = entry.title,
 	)
 	e.save()

@@ -25,6 +25,7 @@ def account(request, acc_id):
 			raise Http404
 		return redirect("account", a.num_id, permanent=True)
 
+	"""
 	tr = obj_list([x.banktransfer for x in a.documents.filter(type_id="P").select_related("banktransfer", "banktransfer__contractor", "banktransfer__issuer", "banktransfer__type")])
 
 	balance = 0
@@ -32,6 +33,8 @@ def account(request, acc_id):
 		balance += t.amount
 		t.balance = balance
 	tr.balance = balance
+	"""
+	tr = []
 
 	ev = a.events
 
@@ -49,16 +52,7 @@ def account(request, acc_id):
 
 def doc(request, acc_id, doc_id):
 	try:
-		a = Account.objects.get(num_id=acc_id)
-	except Account.DoesNotExist:
-		try:
-			a = Account.objects.get(shortcut=acc_id)
-		except Account.DoesNotExist:
-			raise Http404
-		return redirect("account", a.num_id, permanent=True)
-
-	try:
-		d = a.documents.select_related("banktransfer__issuer", "invoice__issuer", "banktransfer__type", "invoice__type", "banktransfer__contractor", "invoice__seller", "invoice__buyer").prefetch_related(Prefetch("banktransfer__events", queryset = Event.objects.select_related("src", "dst"))).prefetch_related("banktransfer__files").prefetch_related(Prefetch("invoice__events", queryset = Event.objects.select_related("src", "dst"))).prefetch_related("invoice__files").get(number=doc_id.replace("-", "/"))
+		d = Document.objects.get(issuer_name = acc_id, number = doc_id.replace("-", "/"))
 	except Document.DoesNotExist:
 		raise Http404
 

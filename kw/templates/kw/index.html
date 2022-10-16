@@ -157,6 +157,7 @@ $("#accounts tr").click(function(){
 			<th>Dokument</th>
 			<th>Data</th>
 			<th>Kontrahent</th>
+			<th>Tytuł</th>
 			<th style="text-align: right;">Kwota Wn</th>
 			<th style="text-align: right;">Kwota Ma</th>
 			<th style="text-align: right;">Saldo Wn</th>
@@ -165,9 +166,10 @@ $("#accounts tr").click(function(){
 	</thead>
 	{% for t in events %}
 		<tr class="{% if account.is_nominal %}{% if t.amount < 0 %}positive{% elif t.amount > 0 %}negative{% endif %}{% else %}{% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% endif %}{% endif %}">
-			<td><a href="{{t.doc.issuer.url}}dokumenty/{{t.doc.number_dashed}}">{{t.doc}}</a></td>
-			<td>{{t.doc.date}}</td>
+			<td><a href="{{t.doc.url}}">{{t.doc}}</a></td>
+			<td>{{t.date}}</td>
 			<td><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
+			<td>{{t.title}}</td>
 			<td style="text-align: right;">{{t.amount|debit}}</td>
 			<td style="text-align: right;">{{t.amount|credit}}</td>
 			<td style="text-align: right;">{{t.balance|debit}}</td>
@@ -176,7 +178,7 @@ $("#accounts tr").click(function(){
 	{% endfor %}
 	<tfoot>
 		<tr>
-			<td colspan="5" style="text-align: right;"><strong>Aktualne saldo:</strong></td>
+			<td colspan="6" style="text-align: right;"><strong>Aktualne saldo:</strong></td>
 			<td style="text-align: right;"><strong>{{balance|debit}}</strong></td>
 			<td style="text-align: right;"><strong>{{balance|credit}}</strong></td>
 		</tr>

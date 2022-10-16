@@ -31,7 +31,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 	]
 
 class BankTransferAdmin(admin.ModelAdmin):
-	list_display = ('__str__', 'date', 'contractor', 'amount', 'title')
+	list_display = ('__str__', 'date', 'amount', 'title')
 	date_hierarchy = 'date'
 	inlines = [
 		AttachmentInline,

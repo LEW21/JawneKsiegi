@@ -85,10 +85,11 @@
 	</thead>
 	{% for t in doc.events.all %}
 		<tr>
-			<td>{{t.doc.date}}</td>
+			<td>{{t.date}}</td>
 			<td><a href="{{t.dst.url}}" title="{{t.dst.pub_name}}">{{t.dst.num_id}}</a></td>
 			<td><a href="{{t.src.url}}" title="{{t.src.pub_name}}">{{t.src.num_id}}</a></td>
 			<td style="text-align: right;">{{t.amount|money}}</td>
+			<td>{{t.title}}</td>
 		</tr>
 	{% endfor %}
 </table>
