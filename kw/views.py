@@ -36,18 +36,27 @@ def account(request, acc_id):
 	"""
 	tr = []
 
-	ev = a.events
+	pev = a.past_events
 
 	balance = 0
-	for e in ev:
+	for e in pev:
 		balance += e.amount
 		e.balance = balance
+	cbalance = balance
+
+	fev = a.future_events
+	for e in fev:
+		balance += e.amount
+		e.balance = balance
+	fbalance = balance
 
 	return render(request, 'kw/index.html', {
 		'account': a,
 		'transfers': tr,
-		'events': ev,
-		'balance': balance,
+		'events': pev,
+		'future_events': fev,
+		'balance': cbalance,
+		'future_balance': fbalance,
 	})
 
 def doc(request, acc_id, doc_id):

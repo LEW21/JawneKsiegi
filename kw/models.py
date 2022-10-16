@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 import uuid
@@ -98,6 +99,14 @@ class Account(models.Model):
 				e.contractor = e.src
 
 		return ev
+
+	@property
+	def past_events(self):
+		return [e for e in self.events if e.date <= date.today()]
+
+	@property
+	def future_events(self):
+		return [e for e in self.events if e.date > date.today()]
 
 class AccountRelationType(models.Model):
 	class Meta:
