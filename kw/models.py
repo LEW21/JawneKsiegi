@@ -173,7 +173,7 @@ class Document(models.Model):
 		unique_together = (("issuer_name", "number"),)
 		ordering = ('issuer_name', 'number')
 
-	date = models.DateField(_("date"))
+	date = models.DateField(_("date"), null = True)
 	date_posted = models.DateField(_("date posted"), auto_now_add=True)
 	#date_posted.editable = True
 	type = models.ForeignKey(DocumentType, on_delete=models.PROTECT, verbose_name=_("type"))

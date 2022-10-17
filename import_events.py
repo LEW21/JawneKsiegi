@@ -24,6 +24,7 @@ class Entry:
 
 	doc_issuer: str
 	doc_id: str
+	doc_issue_date: str
 	doc_title: str
 	doc_party_name: str = None
 	doc_party_email: str = None
@@ -61,11 +62,12 @@ journal = load_journal()
 Event.objects.all().delete()
 Document.objects.all().delete()
 
-for acc in Account.objects.filter(num_id__startswith="200-").order_by('-num_id'):
-	try:
-		acc.delete()
-	except:
-		pass
+for acc in Account.objects.all().order_by('-num_id'):
+	if acc.num_id.startswith('200-') or len(acc.num_id.split('-')) > 2:
+		try:
+			acc.delete()
+		except:
+			pass
 
 accounts = {acc.num_id: acc for acc in Account.objects.all()}
 
@@ -95,7 +97,7 @@ for (us, doc_id), entries in docs:
 		number = doc_id.replace('-', '/'),
 		defaults = dict(
 			type = DocumentType.get('d'),
-			date = entries[0].date,
+			date = entries[0].doc_issue_date or None,
 		),
 	)
 
