@@ -34,62 +34,46 @@
 
 {% block content %}
 
-{% if accounts or account.children %}
-<h2>{% if accounts %}Konta{% else %}Subkonta{% endif %}</h2>
-<div class="unit">
-<table class="table" id="accounts">
-	<thead>
-		<tr>
-			<th class="num-id">ID</th>
-			<th>Nazwa</th>
-			<th class="money">Obroty Wn</th>
-			<th class="money">Obroty Ma</th>
-			<th class="money">Saldo Wn</th>
-			<th class="money">Saldo Ma</th>
-		</tr>
-	</thead>
-	{% for t in accounts %}
-		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% else %}zero{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% else %}zero{% endif %}{% endif %} level{{t.level}}"{% if t.level > 0 %} style="display: none;"{%endif%}>
-			<td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
-			<td>{{t.pub_name}}</td>
-			<td class="turnover debit">{{t.turnover.debit|money}}</td>
-			<td class="turnover credit">{{t.turnover.credit|money}}</td>
-			<td class="balance debit">{{t.turnover.balance|debit}}</td>
-			<td class="balance credit">{{t.turnover.balance|credit}}</td>
-		</tr>
-	{% endfor %}
-	{% for t in account.children %}
-		<tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.is_nominal %}nominal {% if t.turnover.balance < 0 %}positive{% elif t.turnover.balance > 0 %}negative{% else %}zero{% endif %}{% else %}{% if t.turnover.balance > 0 %}positive{% elif t.turnover.balance < 0 %}negative{% else %}zero{% endif %}{% endif %} level{{t.level}}"{% if t.level > account.levelP1 %} style="display: none;"{%endif%}>
-			<td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
-			<td>{{t.pub_name}}</td>
-			<td class="turnover debit">{{t.turnover.debit|money}}</td>
-			<td class="turnover credit">{{t.turnover.credit|money}}</td>
-			<td class="balance debit">{{t.turnover.balance|debit}}</td>
-			<td class="balance credit">{{t.turnover.balance|credit}}</td>
-		</tr>
-	{% endfor %}
-</table>
-</div>
+{% if account.children %}
+	<h2>Subkonta</h2>
+	{% with accounts=account.children level=account.levelP1 %}
+		{% include "kw/_accounts.html" %}
+	{% endwith %}
+{% endif %}
+
+{% if balance_accounts %}
+	<h2>Konta bilansowe</h2>
+	{% with accounts=balance_accounts level=0 %}
+		{% include "kw/_accounts.html" %}
+	{% endwith %}
+{% endif %}
+
+{% if nominal_accounts %}
+	<h2>Konta wynikowe</h2>
+	{% with accounts=nominal_accounts level=0 %}
+		{% include "kw/_accounts.html" %}
+	{% endwith %}
+{% endif %}
 
 <script>
-$("#accounts tr").each(function(){
-	var children = $("#accounts tr[data-parent=" + $(this).data("id") + "]");
+$(".accounts tr").each(function(){
+	var children = $(".accounts tr[data-parent=" + $(this).data("id") + "]");
 	if (!children.length)
 		$(this).addClass("empty");
 })
 
 function acc_parent(acc)
 {
-	var p = $("#accounts tr[data-id=" + $(acc).data("parent") + "]");
+	var p = $(".accounts tr[data-id=" + $(acc).data("parent") + "]");
 	if (!p.length)
 		return null;
 	return p;
 }
 
-$("#accounts tr").click(function(){
+$(".accounts tr").click(function(){
 	$(this).toggleClass("expanded");
 
-	$("#accounts tr").each(function(){
+	$(".accounts tr").each(function(){
 		var p = $(this);
 		var visible = true;
 		while (p = acc_parent(p))
@@ -102,7 +86,6 @@ $("#accounts tr").click(function(){
 	});
 });
 </script>
-{% endif %}
 
 {% if account.relations_from.all %}
 <h2>Powiązane konta</h2>

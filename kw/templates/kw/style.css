@@ -89,22 +89,22 @@ tbody td {
 tbody .turnover, tbody .balance {
   text-align: right; }
 
-tr.zero td, tr.zero a {
+tr.zero td, tr.zero a, td.zero {
   color: #bbb;
 }
-tr.positive:not(.nominal) .balance.debit {
+tr:not(.nominal):not(.capital) .balance.debit:not(.zero) {
   color: #40bf80; }
 
-tr.negative:not(.nominal) .balance.credit {
+tr:not(.nominal):not(.capital) .balance.credit:not(.zero) {
   color: #bf4080; }
 
-tr.positive.nominal .balance.credit {
+tr.nominal .balance.credit:not(.zero), tr.capital .balance.credit:not(.zero) {
   color: #40bf80; }
 
-tr.negative.nominal .balance.debit {
+tr.nominal .balance.debit:not(.zero), tr.capital .balance.debit:not(.zero) {
   color: #bf4080; }
 
-#accounts tr > .num-id::before {
+.accounts tr > .num-id::before {
   content: "";
   opacity: 0.5;
   width: 20px;
@@ -112,25 +112,25 @@ tr.negative.nominal .balance.debit {
   box-sizing: content-box;
   color: {{color1}}; }
 
-#accounts .num-id, #accounts .money {
+.accounts .num-id, .accounts .money {
   width: 150px; }
 
-#accounts .money {
+.accounts .money {
   text-align: right; }
 
-#accounts tbody tr:not(.empty) > .num-id::before {
+.accounts tbody tr:not(.empty) > .num-id::before {
   content: "▶"; }
 
-#accounts tbody tr.expanded:not(.empty) > .num-id::before {
+.accounts tbody tr.expanded:not(.empty) > .num-id::before {
   content: "▼"; }
 
-#accounts tbody tr.level1 > .num-id::before {
+.accounts tbody tr.level1 > .num-id::before {
   padding-left: 20px; }
 
-#accounts tbody tr.level2 > .num-id::before {
+.accounts tbody tr.level2 > .num-id::before {
   padding-left: 40px; }
 
-#accounts tbody tr.level3 > .num-id::before {
+.accounts tbody tr.level3 > .num-id::before {
   padding-left: 60px; }
 
 .django-admin #user-tools {

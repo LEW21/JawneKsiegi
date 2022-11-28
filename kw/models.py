@@ -71,7 +71,11 @@ class Account(models.Model):
 
 	@property
 	def is_nominal(self):
-		return self.num_id >= "400"
+		return self.num_id[0] in {'4', '5', '7'}
+
+	@property
+	def is_capital(self):
+		return self.num_id == '860'
 
 	@property
 	def shortname(self):
@@ -139,7 +143,8 @@ class Turnover(models.Model):
 	id = models.OneToOneField(Account, verbose_name=_("account"), primary_key=True, related_name="turnover", db_column="id", on_delete=models.DO_NOTHING)
 	debit = models.IntegerField(_("debit"))
 	credit = models.IntegerField(_("credit"))
-	balance = models.IntegerField(_("balance"))
+	debit_balance = models.IntegerField(_("debit balance"))
+	credit_balance = models.IntegerField(_("credit balance"))
 
 def format_amount(amount, add_sign = True):
 	sign = 1 if amount > 0 else -1 if amount < 0 else 0

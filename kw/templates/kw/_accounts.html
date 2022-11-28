@@ -1,0 +1,26 @@
+{% load money %}
+
+<div class="unit">
+    <table class="table accounts">
+        <thead>
+            <tr>
+                <th class="num-id">ID</th>
+                <th>Nazwa</th>
+                <th class="money">Obroty Wn</th>
+                <th class="money">Obroty Ma</th>
+                <th class="money">Saldo Wn</th>
+                <th class="money">Saldo Ma</th>
+            </tr>
+        </thead>
+        {% for t in accounts %}
+            <tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.turnover.debit_balance == 0 and t.turnover.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} {% if t.is_capital %}capital{% endif %} level{{t.level}}"{% if t.level > level %} style="display: none;"{% endif %}>
+                <td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
+                <td>{{t.pub_name}}</td>
+                <td class="turnover debit">{{t.turnover.debit|money}}</td>
+                <td class="turnover credit">{{t.turnover.credit|money}}</td>
+                <td class="balance debit {% if t.turnover.debit_balance == 0 %}zero{% endif %}">{{t.turnover.debit_balance|money}}</td>
+                <td class="balance credit {% if t.turnover.credit_balance == 0 %}zero{% endif %}">{{t.turnover.credit_balance|money}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
