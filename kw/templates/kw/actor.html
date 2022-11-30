@@ -1,0 +1,35 @@
+{% extends "kw/base.html" %}
+
+{% load money %}
+
+{% block title %}{{actor}}{% endblock %}
+
+{% block top %}
+<h1>{{actor}}</h1>
+{% endblock %}
+
+{% block content %}
+
+{% if actor.issued_documents %}
+<h2>Wystawione dokumenty</h2>
+<div class="unit">
+<table class="table">
+	<thead>
+		<tr>
+			<th>Data wystawienia</th>
+            <th>Typ</th>
+			<th>Numer</th>
+		</tr>
+	</thead>
+	{% for doc in actor.issued_documents %}
+		<tr>
+            <td>{{doc.date}}</td>
+            <td>{{doc.type}}</td>
+			<td><a href="{{doc.url}}">{{doc.number}}</a></td>
+		</tr>
+	{% endfor %}
+</table>
+</div>
+{% endif %}
+
+{% endblock %}
