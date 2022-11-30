@@ -242,6 +242,8 @@ class InvoiceLine(models.Model):
 	def __str__(self):
 		return str(self.invoice) + ": " + str(self.number) + ". " + str(self.account) + " " + str(self.amount)
 
+account_order = {a: i for i, a in enumerate(['860', '701', '702', '841', '842', '130', '200', '201', '300', '301', '302', '303', '010', '020', '310', '330', '600', '640', '500', '550'])}
+
 class Event(models.Model):
 	class Meta:
 		verbose_name = _('event')
@@ -255,6 +257,22 @@ class Event(models.Model):
 	src = models.ForeignKey(Account, verbose_name=_("from"), related_name="events_from", on_delete=models.DO_NOTHING)
 	dst = models.ForeignKey(Account, verbose_name=_("to"), related_name="events_to", on_delete=models.DO_NOTHING)
 	title = models.TextField(null=True)
+
+	@property
+	def _shall_reverse(self):
+		return min([(account_order[self.src.num_id[:3]], 0), (account_order[self.dst.num_id[:3]], 1)])[1]
+
+	@property
+	def left(self):
+		return [self.src, self.dst][self._shall_reverse]
+
+	@property
+	def right(self):
+		return [self.dst, self.src][self._shall_reverse]
+
+	@property
+	def ltr_amount(self):
+		return [self.amount, -self.amount][self._shall_reverse]
 
 	def __str__(self):
 		return str(self.doc.date) + ": " + str(self.src) + " -> " + str(self.dst) + ": " + str(self.amount)

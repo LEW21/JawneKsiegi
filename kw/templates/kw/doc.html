@@ -86,9 +86,9 @@
 	{% for t in doc.events.all %}
 		<tr>
 			<td>{{t.date}}</td>
-			<td><a href="{{t.dst.url}}" title="{{t.dst.pub_name}}">{{t.dst.num_id}}</a></td>
-			<td><a href="{{t.src.url}}" title="{{t.src.pub_name}}">{{t.src.num_id}}</a></td>
-			<td style="text-align: right;">{{t.amount|money}}</td>
+			<td><a href="{{t.left.url}}" title="{{t.left.pub_name}}">{{t.left.num_id}}</a></td>
+			<td><a href="{{t.right.url}}" title="{{t.right.pub_name}}">{{t.right.num_id}}</a></td>
+			<td style="text-align: right;">{{t.ltr_amount|money}}</td>
 			<td>{{t.title}}</td>
 		</tr>
 	{% endfor %}
