@@ -10,18 +10,7 @@ class Account(models.Model):
 		ordering = ['num_id']
 
 	num_id = models.CharField(_("numeric id"), max_length=30)
-	shortcut = models.CharField(_("shortcut"), max_length=30, blank=True)
 	name = models.CharField(_("name"), max_length=200)
-	address = models.CharField(_("address"), max_length=200, blank=True)
-	bank_account = models.CharField(_("bank account"), max_length=200, blank=True)
-	locality = models.CharField(_("locality"), max_length=200, blank=True)
-	facebook_id = models.CharField(_("facebook id"), max_length=50, blank=True)
-
-	name_public = models.BooleanField(_("publish name?"), default=True)
-	locality_public = models.BooleanField(_("publish locality?"), default=True)
-	address_public = models.BooleanField(_("publish address?"), default=False)
-	bank_account_public = models.BooleanField(_("publish bank account?"), default=False)
-	facebook_public = models.BooleanField(_("publish facebook?"), default=True)
 
 	@property
 	def url(self):
@@ -64,10 +53,7 @@ class Account(models.Model):
 
 	@property
 	def pub_name(self):
-		if self.name_public:
-			return self.name
-
-		return "".join(x[0] if len(x) else "" for x in self.name.split(" "))
+		return self.name
 
 	@property
 	def is_nominal(self):
@@ -76,15 +62,6 @@ class Account(models.Model):
 	@property
 	def is_capital(self):
 		return self.num_id == '860'
-
-	@property
-	def shortname(self):
-		if self.shortcut:
-			return self.shortcut
-
-		if len(self.pub_name) < 20:
-			return self.pub_name
-		return self.pub_name[0:19] + "…"
 
 	def __str__(self):
 		return self.num_id + ". " + self.pub_name

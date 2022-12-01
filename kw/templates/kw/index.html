@@ -6,25 +6,11 @@
 
 {% block top %}
 	{% if account %}
-		<h1>{{account.num_id}}. {{account.pub_name}}
-		{% if account.facebook_id and account.facebook_public %}
-		<a href="https://www.facebook.com/profile.php?id={{account.facebook_id}}"><img src="http://graph.facebook.com/{{account.facebook_id}}/picture"></a>
-		{% endif %}</h1>
+		<h1>{{account.num_id}}. {{account.pub_name}}</h1>
 		<dl class="dl-horizontal" style="overflow: hidden;">
 			{% if account.parent_id %}
 				<dt>Konto syntetyczne</dt>
 				<dd><a href="{{account.parent.url}}">{{account.parent.num_id}}. {{account.parent.pub_name}}</a></dd>
-			{% endif %}
-			{% if account.address and account.address_public %}
-				<dt>Adres</dt>
-				<dd>{{account.address}}</dd>
-			{% elif account.locality and account.locality_public %}
-				<dt>Miejscowość</dt>
-				<dd>{{account.locality}}</dd>
-			{% endif %}
-			{% if account.bank_account and account.bank_account_public %}
-				<dt>Nr konta bankowego</dt>
-				<dd>{{account.bank_account}}</dd>
 			{% endif %}
 		</dl>
 	{% else %}

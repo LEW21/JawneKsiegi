@@ -92,8 +92,9 @@ with transaction.atomic():
 		try:
 			return accounts[num_id]
 		except KeyError:
+			main_account = account(id.split('/')[0])
 			acc, created = Account.objects.get_or_create(num_id = num_id, defaults = dict(
-				name = id.rsplit('/')[-1],
+				name = f"{main_account.name}: {id.rsplit('/')[-1]}",
 			))
 			return acc
 
