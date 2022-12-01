@@ -45,16 +45,7 @@ def load_journal(p):
 				entry.amount_pln = Decimal(entry.amount_pln)
 				journal.append(entry)
 
-	module_order = {
-		'patronite': 1,
-		'zrzutka': 2,
-		'payu': 3,
-		'paribas': 4,
-		'wydatki': 5,
-		'pk': 6,
-	}
-
-	return sorted(journal, key=lambda entry: (entry.date, entry.us, module_order[entry.module], -entry.amount_pln))
+	return journal
 
 def load_accounts(p):
 	accounts = []
