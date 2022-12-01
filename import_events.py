@@ -76,6 +76,10 @@ with transaction.atomic():
 	Event.objects.all().delete()
 	Document.objects.all().delete()
 	Account.objects.all().delete()
+	DocumentType.objects.all().delete()
+
+	doctype = DocumentType(id = 'd', name = 'dokument')
+	doctype.save()
 
 	for account in load_accounts(p):
 		acc = Account(num_id = account.id, name = account.name)
@@ -109,7 +113,7 @@ with transaction.atomic():
 			issuer_name = entries[0].doc_issuer,
 			number = doc_id.replace('-', '/'),
 			defaults = dict(
-				type = DocumentType.get('d'),
+				type = doctype,
 				date = entries[0].doc_issue_date or None,
 			),
 		)
