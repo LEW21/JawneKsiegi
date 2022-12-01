@@ -1,7 +1,6 @@
 from datetime import date
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-import uuid
 
 class Account(models.Model):
 	class Meta:
@@ -89,28 +88,6 @@ class Account(models.Model):
 	def future_events(self):
 		return [e for e in self.events if e.date > date.today()]
 
-class AccountRelationType(models.Model):
-	class Meta:
-		verbose_name = _('account relation type')
-		verbose_name_plural = _('account relation types')
-
-	text_id = models.CharField(_("text id"), max_length=30)
-
-	def __str__(self):
-		return self.text_id
-
-class AccountRelation(models.Model):
-	class Meta:
-		verbose_name = _('account relation')
-		verbose_name_plural = _('account relations')
-
-	src = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("from"), related_name="relations_from")
-	type = models.ForeignKey(AccountRelationType, on_delete=models.PROTECT, verbose_name=_("type"))
-	dst = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("to"), related_name="relations_to")
-
-	def __str__(self):
-		return str(self.src) + " =" + str(self.type) + "> " + str(self.dst)
-
 class Turnover(models.Model):
 	class Meta:
 		verbose_name = _('turnover')
@@ -157,7 +134,6 @@ class Document(models.Model):
 
 	date = models.DateField(_("date"), null = True)
 	date_posted = models.DateField(_("date posted"), auto_now_add=True)
-	#date_posted.editable = True
 	type = models.ForeignKey(DocumentType, on_delete=models.PROTECT, verbose_name=_("type"))
 	issuer_name = models.CharField(_('issuer name'), max_length=100)
 	number = models.CharField(_("number"), max_length=50)
@@ -179,45 +155,6 @@ class Document(models.Model):
 
 	def __str__(self):
 		return self.type.name.capitalize() + " " + self.issuer_name + " " + self.number
-
-class BankTransfer(Document):
-	class Meta:
-		verbose_name = _('bank transfer')
-		verbose_name_plural = _('bank transfers')
-
-	amount = models.IntegerField(_("amount")) # * 0.01 PLN
-	title = models.CharField(_("title"), max_length=200)
-
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.type = DocumentType.get("P")
-
-class Invoice(Document):
-	class Meta:
-		verbose_name = _('invoice')
-		verbose_name_plural = _('invoices')
-
-	date_of_sale = models.DateField(_("date of sale"))
-	seller = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name= _("seller"), related_name="sold")
-	buyer = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("buyer"), related_name="bought", default=1)
-	pit_amount = models.IntegerField(_("PIT amount"), default=0)
-
-	@property
-	def amount(self):
-		return sum(l.amount for l in self.lines.all())
-
-class InvoiceLine(models.Model):
-	class Meta:
-		verbose_name = _('invoice line')
-		verbose_name_plural = _('invoice lines')
-
-	invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, verbose_name=_("invoice"), related_name="lines")
-	number = models.IntegerField(_("number"))
-	account = models.ForeignKey(Account, on_delete=models.PROTECT, verbose_name=_("account"))
-	amount = models.IntegerField(_("amount"))
-
-	def __str__(self):
-		return str(self.invoice) + ": " + str(self.number) + ". " + str(self.account) + " " + str(self.amount)
 
 account_order = {a: i for i, a in enumerate(['860', '701', '702', '841', '842', '130', '200', '201', '300', '301', '302', '303', '010', '020', '310', '330', '600', '640', '500', '550'])}
 
@@ -253,26 +190,3 @@ class Event(models.Model):
 
 	def __str__(self):
 		return str(self.doc.date) + ": " + str(self.src) + " -> " + str(self.dst) + ": " + str(self.amount)
-
-def upload_to(a, user_filename):
-	return "attachments/" + str(uuid.uuid4()).replace("-", "") + "." + user_filename.rsplit(".", 1)[1]
-
-class Attachment(models.Model):
-	class Meta:
-		verbose_name = _('attachment')
-		verbose_name_plural = _('attachments')
-
-	doc = models.ForeignKey(Document, on_delete=models.CASCADE, verbose_name=_("document"), related_name="files")
-	name = models.CharField(_("name"), max_length=100)
-	file = models.FileField(_("file"), upload_to=upload_to)
-	public = models.BooleanField(_("public"), default=True)
-
-	@property
-	def url(self):
-		return self.file.url
-
-	def get_absolute_url(self):
-		return self.url
-
-	def __str__(self):
-		return str(self.doc) + " - " + self.name

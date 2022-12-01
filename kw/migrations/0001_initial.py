@@ -27,17 +27,6 @@ class Migration(migrations.Migration):
 			},
 		),
 		migrations.CreateModel(
-			name='AccountRelationType',
-			fields=[
-				('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-				('text_id', models.CharField(max_length=30, verbose_name='text id')),
-			],
-			options={
-				'verbose_name': 'account relation type',
-				'verbose_name_plural': 'account relation types',
-			},
-		),
-		migrations.CreateModel(
 			name='Document',
 			fields=[
 				('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -79,34 +68,6 @@ class Migration(migrations.Migration):
 			},
 		),
 		migrations.CreateModel(
-			name='BankTransfer',
-			fields=[
-				('document_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='kw.document')),
-				('amount', models.IntegerField(verbose_name='amount')),
-				('title', models.CharField(max_length=200, verbose_name='title')),
-			],
-			options={
-				'verbose_name': 'bank transfer',
-				'verbose_name_plural': 'bank transfers',
-			},
-			bases=('kw.document',),
-		),
-		migrations.CreateModel(
-			name='Invoice',
-			fields=[
-				('document_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='kw.document')),
-				('date_of_sale', models.DateField(verbose_name='date of sale')),
-				('pit_amount', models.IntegerField(default=0, verbose_name='PIT amount')),
-				('buyer', models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='bought', to='kw.account', verbose_name='buyer')),
-				('seller', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sold', to='kw.account', verbose_name='seller')),
-			],
-			options={
-				'verbose_name': 'invoice',
-				'verbose_name_plural': 'invoices',
-			},
-			bases=('kw.document',),
-		),
-		migrations.CreateModel(
 			name='Event',
 			fields=[
 				('id', models.CharField(max_length=100, primary_key=True, serialize=False)),
@@ -127,47 +88,6 @@ class Migration(migrations.Migration):
 			model_name='document',
 			name='type',
 			field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='kw.documenttype', verbose_name='type'),
-		),
-		migrations.CreateModel(
-			name='Attachment',
-			fields=[
-				('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-				('name', models.CharField(max_length=100, verbose_name='name')),
-				('file', models.FileField(upload_to=kw.models.upload_to, verbose_name='file')),
-				('public', models.BooleanField(default=True, verbose_name='public')),
-				('doc', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='files', to='kw.document', verbose_name='document')),
-			],
-			options={
-				'verbose_name': 'attachment',
-				'verbose_name_plural': 'attachments',
-			},
-		),
-		migrations.CreateModel(
-			name='AccountRelation',
-			fields=[
-				('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-				('dst', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='relations_to', to='kw.account', verbose_name='to')),
-				('src', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='relations_from', to='kw.account', verbose_name='from')),
-				('type', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='kw.accountrelationtype', verbose_name='type')),
-			],
-			options={
-				'verbose_name': 'account relation',
-				'verbose_name_plural': 'account relations',
-			},
-		),
-		migrations.CreateModel(
-			name='InvoiceLine',
-			fields=[
-				('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-				('number', models.IntegerField(verbose_name='number')),
-				('amount', models.IntegerField(verbose_name='amount')),
-				('account', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='kw.account', verbose_name='account')),
-				('invoice', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lines', to='kw.invoice', verbose_name='invoice')),
-			],
-			options={
-				'verbose_name': 'invoice line',
-				'verbose_name_plural': 'invoice lines',
-			},
 		),
 		migrations.AlterUniqueTogether(
 			name='document',

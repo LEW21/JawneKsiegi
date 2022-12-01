@@ -96,14 +96,6 @@ def doc(request, actor_id, doc_id):
 	except Document.DoesNotExist:
 		raise Http404
 
-	try:
-		d = d.banktransfer
-	except:
-		try:
-			d = d.invoice
-		except:
-			pass
-
 	return render(request, 'kw/doc.html', {
 		'doc': d
 	})
