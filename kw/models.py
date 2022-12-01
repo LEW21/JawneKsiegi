@@ -156,7 +156,7 @@ class Document(models.Model):
 	def __str__(self):
 		return self.type.name.capitalize() + " " + self.issuer_name + " " + self.number
 
-account_order = {a: i for i, a in enumerate(['860', '701', '702', '841', '842', '130', '200', '201', '300', '301', '302', '303', '010', '020', '310', '330', '600', '640', '500', '550'])}
+account_order = {a: i for i, a in enumerate(['86', '70', '84', '13', '20', '21', '30', '01', '02', '31', '33', '60', '64', '50', '55'])}
 
 class Event(models.Model):
 	class Meta:
@@ -174,7 +174,7 @@ class Event(models.Model):
 
 	@property
 	def _shall_reverse(self):
-		return min([(account_order[self.src.num_id[:3]], 0), (account_order[self.dst.num_id[:3]], 1)])[1]
+		return min([(account_order[self.src.num_id[:2]], 0), (account_order[self.dst.num_id[:2]], 1)])[1]
 
 	@property
 	def left(self):
