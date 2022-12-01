@@ -1,8 +1,28 @@
 @charset "UTF-8";
+
+/*
+:root {
+  --color1: hsl(150, 50%, 70%);
+  --color1l: hsl(150, 50%, 50%);
+  --color1ll: hsl(150, 50%, 30%);
+  --color2: hsl(210, 50%, 70%);
+  --color2l: hsl(210, 50%, 50%);
+  --color2ll: hsl(210, 50%, 30%);
+}
+*/
+:root {
+  --color1: hsl(213, 64%, 22%);
+  --color1l: hsl(213, 64%, 52%);
+  --color1ll: hsl(213, 64%, 22%);
+  --color2: hsl(210, 57%, 36%);
+  --color2l: hsl(210, 57%, 56%);
+  --color2ll: hsl(210, 57%, 30%);
+}
+
 h1, h2 {
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
-  color: {{color1}}; }
+  color: var(--color1); }
 
 .bigbar dt {
   font-weight: normal;
@@ -12,9 +32,9 @@ h1, h2 {
   font-size: 1.1em; }
 
 a {
-  color: {{color2l}}; }
+  color: var(--color2l); }
   a:hover {
-    color: {{color2l}}; }
+    color: var(--color2l); }
 
 html {
   overflow-y: scroll;
@@ -54,12 +74,12 @@ body {
     width: 50%; }
     .bigbar > .bg.left {
       left: 0;
-      background-color: {{color1}}; }
+      background-color: var(--color1); }
     .bigbar > .bg.right {
       right: 0;
-      background-color: {{color2}}; }
+      background-color: var(--color2); }
   .bigbar > .container {
-    background: linear-gradient(to right, {{color1}}, {{color2}});
+    background: linear-gradient(to right, var(--color1), var(--color2));
     position: relative;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -67,7 +87,7 @@ body {
     font-weight: 300; }
 
 .unit {
-  background: linear-gradient(to right, {{color1}}, {{color2}});
+  background: linear-gradient(to right, var(--color1), var(--color2));
   padding: 1px; }
   .unit table th, .unit table td {
     border: 0px !important; }
@@ -110,7 +130,7 @@ tr.nominal .balance.debit:not(.zero), tr.capital .balance.debit:not(.zero) {
   width: 20px;
   display: inline-block;
   box-sizing: content-box;
-  color: {{color1}}; }
+  color: var(--color1); }
 
 .accounts .num-id, .accounts .money {
   width: 150px; }
