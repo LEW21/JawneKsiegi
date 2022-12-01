@@ -23,9 +23,6 @@ def accounts(request):
 		'nominal_accounts': nominal_accounts,
 	})
 
-class obj_list(list):
-	pass
-
 def account(request, acc_id):
 	try:
 		a = Account.objects.get(num_id=acc_id)
@@ -35,17 +32,6 @@ def account(request, acc_id):
 		except Account.DoesNotExist:
 			raise Http404
 		return redirect("account", a.num_id, permanent=True)
-
-	"""
-	tr = obj_list([x.banktransfer for x in a.documents.filter(type_id="P").select_related("banktransfer", "banktransfer__contractor", "banktransfer__issuer", "banktransfer__type")])
-
-	balance = 0
-	for t in tr:
-		balance += t.amount
-		t.balance = balance
-	tr.balance = balance
-	"""
-	tr = []
 
 	pev = a.past_events
 
@@ -63,7 +49,6 @@ def account(request, acc_id):
 
 	return render(request, 'kw/index.html', {
 		'account': a,
-		'transfers': tr,
 		'events': pev,
 		'future_events': fev,
 		'balance': cbalance,
