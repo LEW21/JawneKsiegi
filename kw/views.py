@@ -1,9 +1,7 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from dataclasses import dataclass
-from .models import *
-from django.db.models import Prefetch
+from django.shortcuts import render, redirect
 from django.http import Http404
+from .models import *
 
 def index(request):
 	return redirect("accounts", permanent=False)
