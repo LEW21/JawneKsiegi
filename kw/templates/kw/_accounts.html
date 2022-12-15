@@ -13,7 +13,7 @@
             </tr>
         </thead>
         {% for t in accounts %}
-            <tr data-id="{{t.num_id}}" data-parent="{{t.parent_id}}" class="{% if t.turnover.debit_balance == 0 and t.turnover.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} {% if t.is_capital %}capital{% endif %} level{{t.level}}"{% if t.level > level %} style="display: none;"{% endif %}>
+            <tr data-id="{{t.num_id}}" data-parent="{% if t.parent_id %}{{t.parent_id}}{% endif %}" class="{% if t.turnover.debit_balance == 0 and t.turnover.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} {% if t.is_capital %}capital{% endif %} level{{t.level}}"{% if t.level > level %} style="display: none;"{% endif %}>
                 <td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
                 <td>{{t.pub_name}}</td>
                 <td class="turnover debit">{{t.turnover.debit|money}}</td>

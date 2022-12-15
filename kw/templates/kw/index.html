@@ -42,35 +42,36 @@
 {% endif %}
 
 <script>
-$(".accounts tr").each(function(){
-	var children = $(".accounts tr[data-parent=" + $(this).data("id") + "]");
-	if (!children.length)
-		$(this).addClass("empty");
-})
-
-function acc_parent(acc)
-{
-	var p = $(".accounts tr[data-id=" + $(acc).data("parent") + "]");
-	if (!p.length)
-		return null;
-	return p;
+function syncRows() {
+	for (const row of document.querySelectorAll('.accounts tr')) {
+		let visible = true
+		let p = row
+		while (p = p.parentRow)
+			if (!p.classList.contains("expanded")) {
+				visible = false
+				break
+			}
+		row.style.display = visible ? null : 'none'
+	}
 }
 
-$(".accounts tr").click(function(){
-	$(this).toggleClass("expanded");
+for (const row of document.querySelectorAll('.accounts tr')) {
+	const id = row.dataset.id || ''
+	let children = document.querySelectorAll(".accounts tr[data-parent='" + id.replaceAll("'", "\\'") + "']")
+	if (!children.length)
+		row.classList.add("empty")
 
-	$(".accounts tr").each(function(){
-		var p = $(this);
-		var visible = true;
-		while (p = acc_parent(p))
-			if (!p.hasClass("expanded"))
-				visible = false;
-		if (visible)
-			$(this).show();
-		else
-			$(this).hide();
-	});
-});
+	row.parentRow = document.querySelector(".accounts tr[data-id='" + row.dataset.parent + "']")
+
+	row.addEventListener('click', e => {
+		if (e.target.href)
+			return
+		row.classList.toggle("expanded")
+		syncRows()
+		e.stopPropagation()
+		e.preventDefault()
+	})
+}
 </script>
 
 {% if account.relations_from.all %}
