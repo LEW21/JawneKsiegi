@@ -27,11 +27,7 @@ def account(request, acc_id):
 	try:
 		a = Account.objects.get(num_id=acc_id)
 	except Account.DoesNotExist:
-		try:
-			a = Account.objects.get(shortcut=acc_id)
-		except Account.DoesNotExist:
-			raise Http404
-		return redirect("account", a.num_id, permanent=True)
+		raise Http404
 
 	pev = a.past_events
 
