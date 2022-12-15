@@ -128,11 +128,16 @@ tr.nominal .balance.debit:not(.zero), tr.capital .balance.debit:not(.zero) {
   content: "";
   opacity: 0.5;
   width: 20px;
+  margin-left: -20px;
   display: inline-block;
   box-sizing: content-box;
   color: var(--color1); }
 
-.accounts .num-id, .accounts .money {
+.accounts .num-id {
+  width: 250px;
+}
+
+.accounts .money {
   width: 150px; }
 
 .accounts .money {
@@ -144,11 +149,29 @@ tr.nominal .balance.debit:not(.zero), tr.capital .balance.debit:not(.zero) {
 .accounts tbody tr.expanded:not(.empty) > .num-id::before {
   content: "▼"; }
 
-.accounts tbody tr.level1 > .num-id::before {
-  padding-left: 20px; }
+.accounts tbody tr > .num-id {
+  padding-left: 28px; }
+  
+.accounts tbody tr.level1 > .num-id {
+  padding-left: 48px; }
 
-.accounts tbody tr.level2 > .num-id::before {
-  padding-left: 40px; }
+.accounts tbody tr.level2 > .num-id {
+  padding-left: 68px; }
 
-.accounts tbody tr.level3 > .num-id::before {
-  padding-left: 60px; }
+.accounts tbody tr.level3 > .num-id {
+  padding-left: 88px; }
+
+.accounts tbody tr.level4 > .num-id {
+  padding-left: 108px; }
+
+.accounts tbody tr.level5 > .num-id {
+  padding-left: 128px; }
+
+.accounts tbody tr.level6 > .num-id {
+  padding-left: 148px; }
+
+.accounts tbody tr.level7 > .num-id {
+  padding-left: 168px; }
+
+.accounts tbody tr.level8 > .num-id {
+  padding-left: 188px; }
