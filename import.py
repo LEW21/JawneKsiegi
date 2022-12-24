@@ -9,6 +9,7 @@ from pathlib import Path
 from dataclasses import asdict, dataclass
 from decimal import Decimal
 from django.db import transaction
+from uuid import uuid4
 import csv
 
 from kw.models import *
@@ -27,6 +28,7 @@ class Entry:
 	doc_id: str
 	doc_issue_date: str
 	doc_title: str
+	doc_card: str = None
 	doc_party_name: str = None
 	doc_party_email: str = None
 	doc_party_iban: str = None
@@ -116,7 +118,7 @@ with transaction.atomic():
 		doc = Document.objects.get(issuer_name = entry.doc_issuer, number = entry.doc_id.replace('-', '/'))
 
 		e = Event(
-			id = f"{entry.module}#{entry.id}",
+			id = uuid4().hex,
 			date = entry.date,
 			doc = doc,
 			src = account(src_id),
