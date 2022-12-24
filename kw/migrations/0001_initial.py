@@ -99,11 +99,11 @@ SELECT a.id, a.num_id, coalesce(debit, 0) as debit, coalesce(credit, 0) as credi
 FROM kw_account a
 LEFT JOIN (
 		SELECT k.id as acc, sum(dst.amount) as debit FROM kw_account k
-		LEFT JOIN kw_event dst ON k.id = dst.dst_id AND dst.date < date()
+		LEFT JOIN kw_event dst ON k.id = dst.dst_id AND dst.date <= date()
 		GROUP BY k.id) wn ON wn.acc = a.id
 LEFT JOIN (
 		SELECT k.id as acc, sum(src.amount) as credit FROM kw_account k
-		LEFT JOIN kw_event src ON k.id = src.src_id AND src.date < date()
+		LEFT JOIN kw_event src ON k.id = src.src_id AND src.date <= date()
 		GROUP BY k.id) ma ON ma.acc = a.id
 ORDER BY id;"""),
 		migrations.RunSQL(

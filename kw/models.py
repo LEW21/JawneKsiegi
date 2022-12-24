@@ -82,11 +82,11 @@ class Account(models.Model):
 
 	@property
 	def past_events(self):
-		return [e for e in self.events if e.date < date.today()]
+		return [e for e in self.events if e.date <= date.today()]
 
 	@property
 	def future_events(self):
-		return [e for e in self.events if e.date >= date.today()]
+		return [e for e in self.events if e.date > date.today()]
 
 class Turnover(models.Model):
 	class Meta:
