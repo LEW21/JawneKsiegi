@@ -2,6 +2,7 @@ from itertools import groupby
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jawneksiegi.settings")
 import django
+import datetime
 django.setup()
 
 from collections import namedtuple
@@ -15,20 +16,22 @@ import csv
 from kw.models import *
 
 @dataclass
-class Entry:
-	module: str
-	id: int
-	date: str
-	us: str
+class JournalEntry:
+	date: datetime.date
 	them: str
+	us: str
+
 	amount_pln: Decimal
+	count: Decimal
+	item_id: str
+	item_name: str
+
 	title: str
 
 	doc_issuer: str
 	doc_id: str
-	doc_issue_date: str
+	doc_issue_date: datetime.date
 	doc_title: str
-	doc_card: str = None
 	doc_party_name: str = None
 	doc_party_email: str = None
 	doc_party_iban: str = None
@@ -43,8 +46,9 @@ def load_journal(p):
 			RawEntry = namedtuple('RawEntry', header)
 			for rawEntry in reader:
 				rawEntry = RawEntry(*rawEntry)
-				entry = Entry(**rawEntry._asdict())
+				entry = JournalEntry(**rawEntry._asdict())
 				entry.amount_pln = Decimal(entry.amount_pln)
+				entry.count = Decimal(entry.count) if entry.count else None
 				journal.append(entry)
 
 	return journal
@@ -124,6 +128,9 @@ with transaction.atomic():
 			src = account(src_id),
 			dst = account(dst_id),
 			amount = int((entry.amount_pln if entry.amount_pln >= 0 else -entry.amount_pln) * 100),
+			count = int((entry.count if entry.amount_pln >= 0 else -entry.count) * 100) if entry.count else None,
+			item_id = entry.item_id,
+			item_name = entry.item_name,
 			title = entry.title,
 		)
 		e.save()

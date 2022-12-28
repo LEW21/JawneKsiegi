@@ -88,7 +88,8 @@ body {
 
 .unit {
   background: linear-gradient(to right, var(--color1), var(--color2));
-  padding: 1px; }
+  padding: 1px;
+  overflow-x: auto; }
   .unit table th, .unit table td {
     border: 0px !important; }
   .unit .table.nomargin {

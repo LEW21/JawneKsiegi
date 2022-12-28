@@ -72,11 +72,14 @@ class Migration(migrations.Migration):
 			fields=[
 				('id', models.CharField(max_length=100, primary_key=True, serialize=False)),
 				('date', models.DateField(verbose_name='date')),
-				('amount', models.IntegerField(verbose_name='amount')),
 				('title', models.TextField(null=True)),
 				('doc', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='events', to='kw.document', verbose_name='document')),
 				('dst', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='events_to', to='kw.account', verbose_name='to')),
 				('src', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='events_from', to='kw.account', verbose_name='from')),
+				('amount', models.IntegerField(verbose_name='amount')),
+				('count', models.IntegerField(verbose_name='count', null=True)),
+				('item_id', models.CharField(max_length=50)),
+				('item_name', models.CharField(max_length=100)),
 			],
 			options={
 				'verbose_name': 'event',

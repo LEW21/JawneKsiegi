@@ -124,10 +124,10 @@ for (const row of document.querySelectorAll('.accounts tr')) {
 <table class="table nomargin">
 	<thead>
 		<tr>
-			<th>Dokument</th>
-			<th>Data</th>
-			<th>Kontrahent</th>
-			<th>Tytuł</th>
+			<th>Data, Dokument</th>
+			<th>Tytuł, Kontrahent</th>
+			<th>Rodzaj dobra</th>
+			<th>Liczba sztuk</th>
 			<th style="text-align: right;">Kwota Wn</th>
 			<th style="text-align: right;">Kwota Ma</th>
 			<th style="text-align: right;">Saldo Wn</th>
@@ -136,10 +136,10 @@ for (const row of document.querySelectorAll('.accounts tr')) {
 	</thead>
 	{% for t in events %}
 		<tr class="{% if account.is_nominal %}{% if t.amount < 0 %}positive{% elif t.amount > 0 %}negative{% endif %}{% else %}{% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% endif %}{% endif %}">
-			<td><a href="{{t.doc.url}}">{{t.doc}}</a></td>
-			<td>{{t.date}}</td>
-			<td><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
-			<td>{{t.title}}</td>
+			<td>{{t.date}}<br><a href="{{t.doc.url}}">{{t.doc}}</a></td>
+			<td>{{t.title}}<br><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
+			<td>{{t.item_name}}</td>
+			<td>{{t.count|money_sign}}</td>
 			<td style="text-align: right;">{{t.amount|debit}}</td>
 			<td style="text-align: right;">{{t.amount|credit}}</td>
 			<td style="text-align: right;">{{t.balance|debit}}</td>
@@ -163,10 +163,10 @@ for (const row of document.querySelectorAll('.accounts tr')) {
 <table class="table nomargin">
 	<thead>
 		<tr>
-			<th>Dokument</th>
-			<th>Data</th>
-			<th>Kontrahent</th>
-			<th>Tytuł</th>
+			<th>Data, Dokument</th>
+			<th>Tytuł, Kontrahent</th>
+			<th>Rodzaj dobra</th>
+			<th>Liczba sztuk</th>
 			<th style="text-align: right;">Kwota Wn</th>
 			<th style="text-align: right;">Kwota Ma</th>
 			<th style="text-align: right;">Saldo Wn</th>
@@ -175,10 +175,10 @@ for (const row of document.querySelectorAll('.accounts tr')) {
 	</thead>
 	{% for t in future_events %}
 		<tr class="{% if account.is_nominal %}{% if t.amount < 0 %}positive{% elif t.amount > 0 %}negative{% endif %}{% else %}{% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% endif %}{% endif %}">
-			<td><a href="{{t.doc.url}}">{{t.doc}}</a></td>
-			<td>{{t.date}}</td>
-			<td><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
-			<td>{{t.title}}</td>
+			<td>{{t.date}}<br><a href="{{t.doc.url}}">{{t.doc}}</a></td>
+			<td>{{t.title}}<br><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
+			<td>{{t.item_name}}</td>
+			<td>{{t.count|money_sign}}</td>
 			<td style="text-align: right;">{{t.amount|debit}}</td>
 			<td style="text-align: right;">{{t.amount|credit}}</td>
 			<td style="text-align: right;">{{t.balance|debit}}</td>

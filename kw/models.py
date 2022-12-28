@@ -74,6 +74,7 @@ class Account(models.Model):
 				e.account = e.src
 				e.contractor = e.dst
 				e.amount = -e.amount
+				e.count = -e.count if e.count is not None else None
 			else:
 				e.account = e.dst
 				e.contractor = e.src
@@ -167,9 +168,13 @@ class Event(models.Model):
 	id = models.CharField(max_length=100, primary_key=True)
 	date = models.DateField(_("date"))
 	doc = models.ForeignKey(Document, verbose_name=_("document"), related_name="events", on_delete=models.DO_NOTHING)
-	amount = models.IntegerField(_("amount")) # * 0.01 PLN
 	src = models.ForeignKey(Account, verbose_name=_("from"), related_name="events_from", on_delete=models.DO_NOTHING)
 	dst = models.ForeignKey(Account, verbose_name=_("to"), related_name="events_to", on_delete=models.DO_NOTHING)
+	amount = models.IntegerField(_("amount")) # * 0.01 PLN
+	count = models.IntegerField(_("count"), null=True) # * 0.01
+	item_id = models.CharField(max_length=50)
+	item_name = models.CharField(max_length=100)
+
 	title = models.TextField(null=True)
 
 	@property
