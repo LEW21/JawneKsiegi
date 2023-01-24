@@ -1,0 +1,34 @@
+{% load money %}
+
+<div class="unit">
+    <table class="table {% if has_balance %}nomargin{% endif %} tbl-events">
+        <thead>
+            <tr>
+                <th>Data, Dokument</th>
+                <th>Tytuł, Kontrahent</th>
+                <th>Liczba sztuk</th>
+                <th>Rodzaj świadczenia</th>
+                <th>Wartość</th>
+                <th>Saldo</th>
+            </tr>
+        </thead>
+        {% for t in events %}
+            <tr class="{% if account.is_nominal %}nominal{% endif %} {% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% endif %}">
+                <td>{{t.date}}<br><a href="{{t.doc.url}}">{{t.doc}}</a></td>
+                <td>{{t.title}}<br><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
+                <td class="{% if t.count > 0 %}positive{% elif t.count < 0 %}negative{% else %}zero{% endif %}">{{t.count|money_sign}}</td>
+                <td>{{t.item_name}}</td>
+                <td class="{% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% else %}zero{% endif %}">{{t.amount|money_sign}}</td>
+                <td class="{% if t.balance > 0 %}positive{% elif t.balance < 0 %}negative{% else %}zero{% endif %}"><span>{{t.balance|money_wnma}}</span></td>
+            </tr>
+        {% endfor %}
+        {% if has_balance %}
+        <tfoot>
+            <tr>
+                <td colspan="5"><strong>Aktualne saldo:</strong></td>
+                <td><strong>{{balance|money_wnma}}</strong></td>
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</div>

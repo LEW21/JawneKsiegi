@@ -1,0 +1,28 @@
+{% load money %}
+
+<div class="unit">
+    <table class="table tbl-journal-events">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Tytuł</th>
+                <th>Wn</th>
+                <th>Ma</th>
+                <th>Liczba sztuk</th>
+                <th>Rodzaj świadczenia</th>
+                <th>Wartość</th>
+            </tr>
+        </thead>
+        {% for t in doc.nicely_sorted_events %}
+            <tr>
+                <td>{{t.date}}</td>
+                <td>{{t.title}}</td>
+                <td><a href="{{t.src.url}}" title="{{t.src.num_id}}">{{t.src.top_id}}</a></td>
+                <td><a href="{{t.dst.url}}" title="{{t.dst.num_id}}">{{t.dst.top_id}}</a></td>
+                <td>{{t.count|money}}</td>
+                <td>{{t.item_name}}</td>
+                <td>{{t.amount|money}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>

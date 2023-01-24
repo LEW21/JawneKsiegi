@@ -19,10 +19,32 @@
   --color2ll: hsl(210, 57%, 30%);
 }
 
+body {
+  font-size: 12px;
+}
+
+.container {
+  max-width: 970px !important;
+  width: 100% !important;
+}
+
 h1, h2 {
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
   color: var(--color1); }
+
+h1 {
+  font-size: 3rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+}
+
+h1 small {
+  color: inherit;
+  font-weight: inherit;
+}
 
 .bigbar dt {
   font-weight: normal;
@@ -95,6 +117,10 @@ body {
   .unit .table.nomargin {
     margin-bottom: 0; }
 
+table {
+  table-layout: fixed;
+  overflow-wrap: break-word;
+}
 thead th, tfoot td {
   font-weight: normal;
   font-family: "Open Sans", sans-serif;
@@ -113,66 +139,136 @@ tbody .turnover, tbody .balance {
 tr.zero td, tr.zero a, td.zero {
   color: #bbb;
 }
-tr:not(.nominal):not(.capital) .balance.debit:not(.zero) {
-  color: #40bf80; }
+tr:not(.nominal).positive td, tr.nominal.negative td {
+  background-color: transparent;
+  background-image:
+    linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 1px, rgba(64, 191, 128, 0.05) 1px, rgba(64, 191, 128, 0.05)),
+    linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5) 1px, white 1px, white);
+}
 
-tr:not(.nominal):not(.capital) .balance.credit:not(.zero) {
-  color: #bf4080; }
+tr:not(.nominal).negative td, tr.nominal.positive td {
+  background-color: transparent;
+  background-image:
+    linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 1px, rgba(191, 64, 128, 0.05) 1px, rgba(191, 64, 128, 0.05)),
+    linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5) 1px, white 1px, white);
+}
 
-tr.nominal .balance.credit:not(.zero), tr.capital .balance.credit:not(.zero) {
-  color: #40bf80; }
+tr:not(.nominal) td.positive, tr.nominal td.negative {
+  color: #40bf80;
+  font-weight: bold;
+}
 
-tr.nominal .balance.debit:not(.zero), tr.capital .balance.debit:not(.zero) {
-  color: #bf4080; }
+tr:not(.nominal) td.negative, tr.nominal td.positive {
+  color: #bf4080;
+  font-weight: bold;
+}
 
-.accounts tr > .num-id::before {
+tr:not(.nominal) .balance.debit:not(.zero), tr.nominal .balance.credit:not(.zero) {
+  color: #40bf80;
+  font-weight: bold;
+}
+
+tr:not(.nominal) .balance.credit:not(.zero), tr.nominal .balance.debit:not(.zero) {
+  color: #bf4080;
+  font-weight: bold;
+}
+
+.accounts tr > .num-id > span::before {
   content: "";
   opacity: 0.5;
   width: 20px;
   margin-left: -20px;
-  display: inline-block;
+  font-size: 0.8em;
+  display: block;
+  float: left;
   box-sizing: content-box;
   color: var(--color1); }
 
-.accounts .num-id {
-  width: 250px;
-}
-
-.accounts .money {
-  width: 150px; }
-
-.accounts .money {
-  text-align: right; }
-
-.accounts tbody tr:not(.empty) > .num-id::before {
+.accounts tbody tr:not(.empty) > .num-id > span::before {
   content: "▶"; }
 
-.accounts tbody tr.expanded:not(.empty) > .num-id::before {
+.accounts tbody tr.expanded:not(.empty) > .num-id > span::before {
   content: "▼"; }
 
-.accounts tbody tr > .num-id {
+
+.accounts tbody tr > .num-id > span {
+  display: block;
+}
+.accounts tbody tr > .num-id > span {
   padding-left: 28px; }
   
-.accounts tbody tr.level1 > .num-id {
+.accounts tbody tr.level1 > .num-id > span {
   padding-left: 48px; }
 
-.accounts tbody tr.level2 > .num-id {
+.accounts tbody tr.level2 > .num-id > span {
   padding-left: 68px; }
 
-.accounts tbody tr.level3 > .num-id {
+.accounts tbody tr.level3 > .num-id > span {
   padding-left: 88px; }
 
-.accounts tbody tr.level4 > .num-id {
+.accounts tbody tr.level4 > .num-id > span {
   padding-left: 108px; }
 
-.accounts tbody tr.level5 > .num-id {
+.accounts tbody tr.level5 > .num-id > span {
   padding-left: 128px; }
 
-.accounts tbody tr.level6 > .num-id {
+.accounts tbody tr.level6 > .num-id > span {
   padding-left: 148px; }
 
-.accounts tbody tr.level7 > .num-id {
+.accounts tbody tr.level7 > .num-id > span {
   padding-left: 168px; }
 
-.accounts tbody tr.level8 > .num-id {
+.accounts tbody tr.level8 > .num-id > span {
   padding-left: 188px; }
+
+
+.tbl-events, .tbl-events thead, .tbl-events tbody, .tbl-events tfoot { display: block; width: 100%; }
+
+.tbl-events tr { display: flex; }
+
+.tbl-events tr > * { overflow: hidden; }
+.tbl-events tr > :nth-last-child(6) { flex: 1 0 0; text-align: left; }
+.tbl-events tr > :nth-last-child(5) { flex: 2 0 0; text-align: left; }
+.tbl-events tr > :nth-last-child(4) { flex: 0 0 80px; text-align: right; }
+.tbl-events tr > :nth-last-child(3) { flex: 0 0 100px; text-align: left; }
+.tbl-events tr > :nth-last-child(2) { flex: 0 0 100px; text-align: right; }
+.tbl-events tr > :nth-last-child(1) { flex: 0 0 100px; text-align: right; }
+.tbl-events tr > td:nth-last-child(1) { display: flex; }
+.tbl-events tr > td:nth-last-child(1) > span { flex: 1; align-self: end; }
+
+.tbl-events tfoot tr > :nth-last-child(2) { flex: 1 0 0; text-align: right; }
+
+.tbl-accounts, .tbl-accounts thead, .tbl-accounts tbody, .tbl-accounts tfoot { display: block; width: 100%; }
+
+.tbl-accounts tr { display: flex; }
+
+.tbl-accounts tr > * { overflow: hidden; }
+.tbl-accounts tr > :nth-last-child(6) { flex: 1 1 150px; text-align: left; }
+.tbl-accounts tr > :nth-last-child(5) { flex: 2 1 150px; text-align: left; }
+.tbl-accounts tr > :nth-last-child(4) { flex: 0 0 80px; text-align: right; }
+.tbl-accounts tr > :nth-last-child(3) { flex: 0 0 80px; text-align: right; }
+.tbl-accounts tr > :nth-last-child(2) { flex: 0 0 80px; text-align: right; }
+.tbl-accounts tr > :nth-last-child(1) { flex: 0 0 80px; text-align: right; }
+
+.tbl-accounts tfoot tr > :nth-last-child(3) { flex: 1 0 0; text-align: right; }
+
+.tbl-documents, .tbl-documents thead, .tbl-documents tbody, .tbl-documents tfoot { display: block; width: 100%; }
+
+.tbl-documents tr { display: flex; }
+
+.tbl-documents tr > * { overflow: hidden; }
+.tbl-documents tr > :nth-last-child(2) { flex: 0 0 160px; text-align: right; }
+.tbl-documents tr > :nth-last-child(1) { flex: 1 1 200px; text-align: left; }
+
+.tbl-journal-events, .tbl-journal-events thead, .tbl-journal-events tbody, .tbl-journal-events tfoot { display: block; width: 100%; }
+
+.tbl-journal-events tr { display: flex; }
+
+.tbl-journal-events tr > * { overflow: hidden; }
+.tbl-journal-events tr > :nth-last-child(7) { flex: 0 0 160px; text-align: right; }
+.tbl-journal-events tr > :nth-last-child(6) { flex: 1 1 150px; text-align: left; }
+.tbl-journal-events tr > :nth-last-child(5) { flex: 0 0  60px; text-align: left; }
+.tbl-journal-events tr > :nth-last-child(4) { flex: 0 0  60px; text-align: left; }
+.tbl-journal-events tr > :nth-last-child(3) { flex: 0 0  80px; text-align: right; }
+.tbl-journal-events tr > :nth-last-child(2) { flex: 0 0 100px; text-align: left; }
+.tbl-journal-events tr > :nth-last-child(1) { flex: 0 0  80px; text-align: right; }

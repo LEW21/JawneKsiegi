@@ -6,7 +6,7 @@
 
 {% block top %}
 	{% if account %}
-		<h1>{{account.num_id}}. {{account.pub_name}}</h1>
+		<h1>{{account.num_id}}.<br><small>{{account.pub_name}}</small></h1>
 		<dl class="dl-horizontal" style="overflow: hidden;">
 			{% if account.parent_id %}
 				<dt>Konto syntetyczne</dt>
@@ -74,126 +74,18 @@ for (const row of document.querySelectorAll('.accounts tr')) {
 }
 </script>
 
-{% if account.relations_from.all %}
-<h2>Powiązane konta</h2>
-<dl class="dl-horizontal">
-	{% for r in account.relations_from.all %}
-		<dt>{{r.type|capfirst}}</dt>
-		<dd><a href="{{r.dst.url}}">{{r.dst.pub_name}}</a></dd>
-	{% endfor %}
-</dl>
-{% endif %}
-
-{% if transfers %}
-<h2>Przelewy na rachunku</h2>
-<div class="unit">
-<table class="table nomargin">
-	<thead>
-		<tr>
-			<th>ID</th>
-			<th>Data</th>
-			<th>Kontrahent</th>
-			<th>Tytuł</th>
-			<th style="text-align: right;">Kwota</th>
-			<th style="text-align: right;">Saldo</th>
-		</tr>
-	</thead>
-	{% for t in transfers %}
-		<tr class="{% if t.amount > 0 %}positive{% else %}negative{% endif %}">
-			<td><a href="{{t.issuer.url}}dokumenty/{{t.number_dashed}}">{{t.number}}</a></td>
-			<td style="white-space: nowrap">{{t.date}}</td>
-			<td><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
-			<td>{{t.title}}</td>
-			<td style="text-align: right;">{{t.amount|money_sign}}</td>
-			<td style="text-align: right;">{{t.balance|money}}</td>
-		</tr>
-	{% endfor %}
-	<tfoot>
-		<tr>
-			<td colspan="5" style="text-align: right;"><strong>Aktualne saldo:</strong></td>
-			<td style="text-align: right;"><strong>{{transfers.balance|money_sign}}</strong></td>
-		</tr>
-	</tfoot>
-</table>
-</div>
-{% endif %}
-
 {% if events %}
-<h2>Zdarzenia</h2>
-<div class="unit">
-<table class="table nomargin">
-	<thead>
-		<tr>
-			<th>Data, Dokument</th>
-			<th>Tytuł, Kontrahent</th>
-			<th>Rodzaj dobra</th>
-			<th>Liczba sztuk</th>
-			<th style="text-align: right;">Kwota Wn</th>
-			<th style="text-align: right;">Kwota Ma</th>
-			<th style="text-align: right;">Saldo Wn</th>
-			<th style="text-align: right;">Saldo Ma</th>
-		</tr>
-	</thead>
-	{% for t in events %}
-		<tr class="{% if account.is_nominal %}{% if t.amount < 0 %}positive{% elif t.amount > 0 %}negative{% endif %}{% else %}{% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% endif %}{% endif %}">
-			<td>{{t.date}}<br><a href="{{t.doc.url}}">{{t.doc}}</a></td>
-			<td>{{t.title}}<br><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
-			<td>{{t.item_name}}</td>
-			<td>{{t.count|money_sign}}</td>
-			<td style="text-align: right;">{{t.amount|debit}}</td>
-			<td style="text-align: right;">{{t.amount|credit}}</td>
-			<td style="text-align: right;">{{t.balance|debit}}</td>
-			<td style="text-align: right;">{{t.balance|credit}}</td>
-		</tr>
-	{% endfor %}
-	<tfoot>
-		<tr>
-			<td colspan="6" style="text-align: right;"><strong>Aktualne saldo:</strong></td>
-			<td style="text-align: right;"><strong>{{balance|debit}}</strong></td>
-			<td style="text-align: right;"><strong>{{balance|credit}}</strong></td>
-		</tr>
-	</tfoot>
-</table>
-</div>
+	<h2>Zdarzenia</h2>
+	{% with has_balance=True %}
+		{% include "kw/_account_events.html" %}
+	{% endwith %}
 {% endif %}
 
 {% if future_events %}
-<h2>Planowane zdarzenia</h2>
-<div class="unit">
-<table class="table nomargin">
-	<thead>
-		<tr>
-			<th>Data, Dokument</th>
-			<th>Tytuł, Kontrahent</th>
-			<th>Rodzaj dobra</th>
-			<th>Liczba sztuk</th>
-			<th style="text-align: right;">Kwota Wn</th>
-			<th style="text-align: right;">Kwota Ma</th>
-			<th style="text-align: right;">Saldo Wn</th>
-			<th style="text-align: right;">Saldo Ma</th>
-		</tr>
-	</thead>
-	{% for t in future_events %}
-		<tr class="{% if account.is_nominal %}{% if t.amount < 0 %}positive{% elif t.amount > 0 %}negative{% endif %}{% else %}{% if t.amount > 0 %}positive{% elif t.amount < 0 %}negative{% endif %}{% endif %}">
-			<td>{{t.date}}<br><a href="{{t.doc.url}}">{{t.doc}}</a></td>
-			<td>{{t.title}}<br><a href="{{t.contractor.url}}">{{t.contractor.pub_name}}</a></td>
-			<td>{{t.item_name}}</td>
-			<td>{{t.count|money_sign}}</td>
-			<td style="text-align: right;">{{t.amount|debit}}</td>
-			<td style="text-align: right;">{{t.amount|credit}}</td>
-			<td style="text-align: right;">{{t.balance|debit}}</td>
-			<td style="text-align: right;">{{t.balance|credit}}</td>
-		</tr>
-	{% endfor %}
-	<tfoot>
-		<tr>
-			<td colspan="6" style="text-align: right;"><strong>Planowane saldo:</strong></td>
-			<td style="text-align: right;"><strong>{{future_balance|debit}}</strong></td>
-			<td style="text-align: right;"><strong>{{future_balance|credit}}</strong></td>
-		</tr>
-	</tfoot>
-</table>
-</div>
+	<h2>Planowane zdarzenia</h2>
+	{% with events=future_events %}
+		{% include "kw/_account_events.html" %}
+	{% endwith %}
 {% endif %}
 
 {% endblock %}

@@ -19,6 +19,10 @@ def money_sign(value):
 	return format_amount(value, True)
 
 @register.filter
+def money_wnma(value):
+	return format_amount(value, True).replace('+', 'Wn ').replace('-', 'Ma ')
+
+@register.filter
 def debit(value):
 	return format_amount(value, False) if value > 0 else "0.00"
 

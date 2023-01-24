@@ -1,20 +1,20 @@
 {% load money %}
 
 <div class="unit">
-    <table class="table accounts">
+    <table class="table accounts tbl-accounts">
         <thead>
             <tr>
                 <th class="num-id">ID</th>
                 <th>Nazwa</th>
-                <th class="money">Obroty Wn</th>
-                <th class="money">Obroty Ma</th>
-                <th class="money">Saldo Wn</th>
-                <th class="money">Saldo Ma</th>
+                <th class="money">Obroty<br>Wn</th>
+                <th class="money">Obroty<br>Ma</th>
+                <th class="money">Saldo<br>Wn</th>
+                <th class="money">Saldo<br>Ma</th>
             </tr>
         </thead>
         {% for t in accounts %}
-            <tr data-id="{{t.num_id}}" data-parent="{% if t.parent_id %}{{t.parent_id}}{% endif %}" class="{% if t.turnover.debit_balance == 0 and t.turnover.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} {% if t.is_capital %}capital{% endif %} level{{t.level}}"{% if t.level > level %} style="display: none;"{% endif %}>
-                <td class="num-id"><a href="{{t.url}}">{{t.local_id}}</a></td>
+            <tr data-id="{{t.num_id}}" data-parent="{% if t.parent_id %}{{t.parent_id}}{% endif %}" class="{% if t.turnover.debit_balance == 0 and t.turnover.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} level{{t.level}}"{% if t.level > level %} style="display: none;"{% endif %}>
+                <td class="num-id"><span><a href="{{t.url}}">{{t.local_id}}</a></span></td>
                 <td>{{t.pub_name}}</td>
                 <td class="turnover debit">{{t.turnover.debit|money}}</td>
                 <td class="turnover credit">{{t.turnover.credit|money}}</td>

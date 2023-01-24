@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import date
+from dataclasses import dataclass
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -32,6 +35,10 @@ class Account(models.Model):
 		return self.num_id.rsplit("-", 1)[-1]
 
 	@property
+	def top_id(self):
+		return self.num_id.partition('-')[0]
+
+	@property
 	def parent_id(self):
 		try:
 			return self.num_id.rsplit("-", 1)[-2]
@@ -56,30 +63,35 @@ class Account(models.Model):
 
 	@property
 	def is_nominal(self):
-		return self.num_id[0] in {'4', '5', '7'}
-
-	@property
-	def is_capital(self):
-		return self.num_id == '860'
+		return self.num_id[0] == '7'
 
 	def __str__(self):
 		return self.num_id + ". " + self.pub_name
 
+	@dataclass
+	class AccountEvent:
+		entry: Event
+		date: date
+		account: Account
+		contractor: Account
+		amount: int
+		count: int
+		doc: Document
+		item_id: str
+		item_name: str
+		title: str
+
 	@property
-	def events(self):
-		ev = Event.objects.filter(models.Q(src=self) | models.Q(dst=self)).select_related("src", "dst", "doc", "doc__type")
-
-		for e in ev:
+	def events(self) -> list[AccountEvent]:
+		eventss = []
+		for e in Event.objects.filter(models.Q(src=self) | models.Q(dst=self)).select_related("src", "dst", "doc", "doc__type"):
+			events = []
 			if e.src == self:
-				e.account = e.src
-				e.contractor = e.dst
-				e.amount = -e.amount
-				e.count = -e.count if e.count is not None else None
-			else:
-				e.account = e.dst
-				e.contractor = e.src
-
-		return ev
+				events.append(self.AccountEvent(e, e.date, e.src, e.dst, -e.amount, -e.count if e.count is not None else None, e.doc, e.item_id, e.item_name, e.title))
+			if e.dst == self:
+				events.append(self.AccountEvent(e, e.date, e.dst, e.src, e.amount, e.count if e.count is not None else None, e.doc, e.item_id, e.item_name, e.title))
+			eventss.append(events)
+		return sum(sorted(eventss, key=lambda es: (es[0].date, es[0].doc.id, -abs(es[0].amount), es[0].amount)), [])
 
 	@property
 	def past_events(self):
@@ -126,6 +138,9 @@ class DocumentType(models.Model):
 			cls.cache[id] = cls.objects.get(id=id)
 			return cls.cache[id]
 
+from collections import defaultdict
+from graphlib import TopologicalSorter, CycleError
+
 class Document(models.Model):
 	class Meta:
 		verbose_name = _('document')
@@ -157,7 +172,18 @@ class Document(models.Model):
 	def __str__(self):
 		return self.type.name.capitalize() + " " + self.issuer_name + " " + self.number
 
-account_order = {a: i for i, a in enumerate(['7011', '7212', '841', '842', '2000', '2001', '130', '3010', '3020', '3030', '3011', '3021', '3031', '010', '020', '310', '330', '600', '640', '7020', '7120', '7220', '7320', '7420', '7520', '7620'])}
+	@property
+	def nicely_sorted_events(self):
+		all_events = self.events.all()
+		graph = defaultdict(list)
+		for ev in all_events:
+			graph[ev.dst_id].append(ev.src_id)
+		try:
+			order = TopologicalSorter(graph).static_order()
+			for src_id in order:
+				yield from [ev for ev in all_events if ev.src_id == src_id]
+		except CycleError:
+			yield from all_events
 
 class Event(models.Model):
 	class Meta:
@@ -176,22 +202,6 @@ class Event(models.Model):
 	item_name = models.CharField(max_length=100)
 
 	title = models.TextField(null=True)
-
-	@property
-	def _shall_reverse(self):
-		return min([(account_order[self.src.num_id.split('-')[0]], 0), (account_order[self.dst.num_id.split('-')[0]], 1)])[1]
-
-	@property
-	def left(self):
-		return [self.src, self.dst][self._shall_reverse]
-
-	@property
-	def right(self):
-		return [self.dst, self.src][self._shall_reverse]
-
-	@property
-	def ltr_amount(self):
-		return [self.amount, -self.amount][self._shall_reverse]
 
 	def __str__(self):
 		return str(self.doc.date) + ": " + str(self.src) + " -> " + str(self.dst) + ": " + str(self.amount)

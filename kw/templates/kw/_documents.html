@@ -1,0 +1,18 @@
+{% load money %}
+
+<div class="unit">
+    <table class="table tbl-documents">
+        <thead>
+            <tr>
+                <th>Data wystawienia</th>
+                <th>Numer</th>
+            </tr>
+        </thead>
+        {% for doc in documents %}
+            <tr>
+                <td>{{doc.date}}</td>
+                <td><a href="{{doc.url}}">{{doc.number}}</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>

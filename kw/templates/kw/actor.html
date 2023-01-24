@@ -11,25 +11,10 @@
 {% block content %}
 
 {% if actor.issued_documents %}
-<h2>Wystawione dokumenty</h2>
-<div class="unit">
-<table class="table">
-	<thead>
-		<tr>
-			<th>Data wystawienia</th>
-            <th>Typ</th>
-			<th>Numer</th>
-		</tr>
-	</thead>
-	{% for doc in actor.issued_documents %}
-		<tr>
-            <td>{{doc.date}}</td>
-            <td>{{doc.type}}</td>
-			<td><a href="{{doc.url}}">{{doc.number}}</a></td>
-		</tr>
-	{% endfor %}
-</table>
-</div>
+	<h2>Wystawione dokumenty</h2>
+	{% with documents=actor.issued_documents %}
+		{% include "kw/_documents.html" %}
+	{% endwith %}
 {% endif %}
 
 {% endblock %}
