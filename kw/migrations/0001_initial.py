@@ -109,11 +109,4 @@ LEFT JOIN (
 		LEFT JOIN kw_event src ON k.id = src.src_id AND src.date <= date()
 		GROUP BY k.id) ma ON ma.acc = a.id
 ORDER BY id;"""),
-		migrations.RunSQL(
-"""CREATE VIEW kw_turnover AS
-SELECT a.id, a.num_id, coalesce(sum(sub.debit), 0) as debit, coalesce(sum(sub.credit), 0) as credit, coalesce(sum(max(sub.balance, 0)), 0) as debit_balance, -coalesce(sum(min(sub.balance, 0)), 0) as credit_balance
-FROM kw_account a
-LEFT JOIN kw_turnover_own sub ON (sub.num_id = a.num_id OR sub.num_id LIKE a.num_id||'-%')
-GROUP BY a.id
-ORDER BY a.num_id;"""),
 	]

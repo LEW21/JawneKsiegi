@@ -22,21 +22,21 @@
 
 {% if account.children %}
 	<h2>Subkonta</h2>
-	{% with accounts=account.children level=account.levelP1 %}
+	{% with account=account %}
 		{% include "kw/_accounts.html" %}
 	{% endwith %}
 {% endif %}
 
-{% if balance_accounts %}
+{% if top_accounts.balance %}
 	<h2>Konta bilansowe</h2>
-	{% with accounts=balance_accounts level=0 %}
+	{% with account=top_accounts.balance %}
 		{% include "kw/_accounts.html" %}
 	{% endwith %}
 {% endif %}
 
-{% if nominal_accounts %}
+{% if top_accounts.nominal %}
 	<h2>Konta wynikowe</h2>
-	{% with accounts=nominal_accounts level=0 %}
+	{% with account=top_accounts.nominal %}
 		{% include "kw/_accounts.html" %}
 	{% endwith %}
 {% endif %}
@@ -55,23 +55,40 @@ function syncRows() {
 	}
 }
 
-for (const row of document.querySelectorAll('.accounts tr')) {
-	const id = row.dataset.id || ''
-	let children = document.querySelectorAll(".accounts tr[data-parent='" + id.replaceAll("'", "\\'") + "']")
-	if (!children.length)
-		row.classList.add("empty")
+setTimeout(() => {
+	console.time('setup accounts list')
+	const rows = []
 
-	row.parentRow = document.querySelector(".accounts tr[data-id='" + row.dataset.parent + "']")
+	for (const row of document.querySelectorAll('.accounts tbody tr')) {
+		rows[row.dataset.id] = row
+		row.childRows = []
+		row.parentRow = rows[row.dataset.parent]
+		if (row.parentRow) row.parentRow.childRows.push(row)
+	}
 
-	row.addEventListener('click', e => {
-		if (e.target.href)
-			return
-		row.classList.toggle("expanded")
-		syncRows()
-		e.stopPropagation()
-		e.preventDefault()
-	})
-}
+	for (const row of document.querySelectorAll('.accounts tbody tr')) {
+		if (!row.childRows.length) row.classList.add("empty")
+	}
+
+	for (const accounts of document.querySelectorAll('.accounts')) {
+		accounts.addEventListener('click', e => {
+			const row = (() => {
+				let target = e.target
+				while (target) {
+					if (target.href) return
+					target = target.parentNode
+					if (target && target.dataset && target.dataset.id) return target
+				}
+			})()
+			if (!row) return
+			e.stopPropagation()
+			e.preventDefault()
+			row.classList.toggle("expanded")
+			syncRows()
+		})
+	}
+	console.timeEnd('setup accounts list')
+}, 0)
 </script>
 
 {% if events %}

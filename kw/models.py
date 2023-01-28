@@ -1,11 +1,73 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from datetime import date
 from dataclasses import dataclass
+from typing import TypeVar
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-class Account(models.Model):
+class AccountMixin:
+	@property
+	@abstractmethod
+	def num_id(self) -> str:
+		...
+
+	@property
+	@abstractmethod
+	def level(self) -> int:
+		...
+
+	@property
+	@abstractmethod
+	def _children(self) -> models.BaseManager[Account]:
+		...
+
+	@property
+	@abstractmethod
+	def is_nominal(self) -> bool:
+		...
+
+	@property
+	def levelP1(self):
+		return self.level + 1
+
+	@property
+	def children(self) -> list[Account]:
+		accounts = list(self._children.select_related('own_turnover'))
+		acc_by_id = {self.num_id: self}
+		self.debit_turnover = 0
+		self.credit_turnover = 0
+		self.debit_balance = 0
+		self.credit_balance = 0
+		for acc in accounts:
+			acc.debit_turnover = acc.own_turnover.debit
+			acc.credit_turnover = acc.own_turnover.credit
+			acc.debit_balance = acc.own_turnover.debit_balance
+			acc.credit_balance = acc.own_turnover.credit_balance
+			acc_by_id[acc.num_id] = acc
+			ancestor = acc
+			while (ancestor.num_id and (ancestor := acc_by_id.get(ancestor.parent_id, None))):
+				ancestor.debit_turnover += acc.debit_turnover
+				ancestor.credit_turnover += acc.credit_turnover
+				ancestor.debit_balance += acc.debit_balance
+				ancestor.credit_balance += acc.credit_balance
+
+		return accounts
+
+@dataclass
+class TopAccount(AccountMixin):
+	num_id = None
+	level = -1
+	is_nominal: bool = None
+	_children: models.BaseManager[Account] = None
+
+class TopAccounts:
+	def __init__(self):
+		self.balance = TopAccount(False, Account.objects.exclude(num_id__startswith='7'))
+		self.nominal = TopAccount(True, Account.objects.filter(num_id__startswith='7'))
+
+class Account(AccountMixin, models.Model):
 	class Meta:
 		verbose_name = _('account')
 		verbose_name_plural = _('accounts')
@@ -25,10 +87,6 @@ class Account(models.Model):
 	@property
 	def level(self):
 		return self.num_id.count("-")
-
-	@property
-	def levelP1(self):
-		return self.level + 1
 
 	@property
 	def local_id(self):
@@ -54,8 +112,8 @@ class Account(models.Model):
 			return self.parent_cache
 
 	@property
-	def children(self):
-		return Account.objects.filter(num_id__startswith=self.num_id + "-").select_related("turnover")
+	def _children(self):
+		return Account.objects.filter(num_id__startswith=self.num_id + "-")
 
 	@property
 	def pub_name(self):
@@ -101,17 +159,22 @@ class Account(models.Model):
 	def future_events(self):
 		return [e for e in self.events if e.date > date.today()]
 
-class Turnover(models.Model):
+class Turnover_Own(models.Model):
 	class Meta:
 		verbose_name = _('turnover')
 		verbose_name_plural = _('turnovers')
 		managed = False
 
-	id = models.OneToOneField(Account, verbose_name=_("account"), primary_key=True, related_name="turnover", db_column="id", on_delete=models.DO_NOTHING)
+	id = models.OneToOneField(Account, verbose_name=_("account"), primary_key=True, related_name="own_turnover", db_column="id", on_delete=models.DO_NOTHING)
 	debit = models.IntegerField(_("debit"))
 	credit = models.IntegerField(_("credit"))
-	debit_balance = models.IntegerField(_("debit balance"))
-	credit_balance = models.IntegerField(_("credit balance"))
+	balance = models.IntegerField()
+	@property
+	def credit_balance(self):
+		return max(-self.balance, 0)
+	@property
+	def debit_balance(self):
+		return max(self.balance, 0)
 
 def format_amount(amount, add_sign = True):
 	sign = 1 if amount > 0 else -1 if amount < 0 else 0

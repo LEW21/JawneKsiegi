@@ -121,12 +121,13 @@ table {
   table-layout: fixed;
   overflow-wrap: break-word;
 }
-thead th, tfoot td {
+thead th, tfoot th, thead td, tfoot td {
   font-weight: normal;
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
-  font-size: 1.2em;
   color: white; }
+thead th, tfoot th {
+  font-size: 1.2em;}
 
 tbody td {
   background-color: transparent;
@@ -234,7 +235,7 @@ tr:not(.nominal) .balance.credit:not(.zero), tr.nominal .balance.debit:not(.zero
 .tbl-events tr > :nth-last-child(2) { flex: 0 0 100px; text-align: right; }
 .tbl-events tr > :nth-last-child(1) { flex: 0 0 100px; text-align: right; }
 .tbl-events tr > td:nth-last-child(1) { display: flex; }
-.tbl-events tr > td:nth-last-child(1) > span { flex: 1; align-self: end; }
+.tbl-events tr > td:nth-last-child(1) > span, .tbl-events tr > td:nth-last-child(1) > strong { flex: 1; align-self: end; }
 
 .tbl-events tfoot tr > :nth-last-child(2) { flex: 1 0 0; text-align: right; }
 
@@ -245,12 +246,12 @@ tr:not(.nominal) .balance.credit:not(.zero), tr.nominal .balance.debit:not(.zero
 .tbl-accounts tr > * { overflow: hidden; }
 .tbl-accounts tr > :nth-last-child(6) { flex: 1 1 150px; text-align: left; }
 .tbl-accounts tr > :nth-last-child(5) { flex: 2 1 150px; text-align: left; }
-.tbl-accounts tr > :nth-last-child(4) { flex: 0 0 80px; text-align: right; }
-.tbl-accounts tr > :nth-last-child(3) { flex: 0 0 80px; text-align: right; }
-.tbl-accounts tr > :nth-last-child(2) { flex: 0 0 80px; text-align: right; }
-.tbl-accounts tr > :nth-last-child(1) { flex: 0 0 80px; text-align: right; }
+.tbl-accounts tr > :nth-last-child(4) { flex: 0 0 90px; text-align: right; }
+.tbl-accounts tr > :nth-last-child(3) { flex: 0 0 90px; text-align: right; }
+.tbl-accounts tr > :nth-last-child(2) { flex: 0 0 90px; text-align: right; }
+.tbl-accounts tr > :nth-last-child(1) { flex: 0 0 90px; text-align: right; }
 
-.tbl-accounts tfoot tr > :nth-last-child(3) { flex: 1 0 0; text-align: right; }
+.tbl-accounts tfoot tr > :nth-last-child(5) { flex: 1 0 0; text-align: right; }
 
 .tbl-documents, .tbl-documents thead, .tbl-documents tbody, .tbl-documents tfoot { display: block; width: 100%; }
 

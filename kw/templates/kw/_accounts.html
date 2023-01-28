@@ -1,7 +1,7 @@
 {% load money %}
 
 <div class="unit">
-    <table class="table accounts tbl-accounts">
+    <table class="table accounts nomargin tbl-accounts">
         <thead>
             <tr>
                 <th class="num-id">ID</th>
@@ -12,15 +12,24 @@
                 <th class="money">Saldo<br>Ma</th>
             </tr>
         </thead>
-        {% for t in accounts %}
-            <tr data-id="{{t.num_id}}" data-parent="{% if t.parent_id %}{{t.parent_id}}{% endif %}" class="{% if t.turnover.debit_balance == 0 and t.turnover.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} level{{t.level}}"{% if t.level > level %} style="display: none;"{% endif %}>
+        {% for t in account.children %}
+            <tr data-id="{{t.num_id}}" data-parent="{% if t.parent_id %}{{t.parent_id}}{% endif %}" class="{% if t.debit_balance == 0 and t.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} level{{t.level}}"{% if t.level > account.levelP1 %} style="display: none;"{% endif %}>
                 <td class="num-id"><span><a href="{{t.url}}">{{t.local_id}}</a></span></td>
                 <td>{{t.pub_name}}</td>
-                <td class="turnover debit">{{t.turnover.debit|money}}</td>
-                <td class="turnover credit">{{t.turnover.credit|money}}</td>
-                <td class="balance debit {% if t.turnover.debit_balance == 0 %}zero{% endif %}">{{t.turnover.debit_balance|money}}</td>
-                <td class="balance credit {% if t.turnover.credit_balance == 0 %}zero{% endif %}">{{t.turnover.credit_balance|money}}</td>
+                <td class="turnover debit">{{t.debit_turnover|money}}</td>
+                <td class="turnover credit">{{t.credit_turnover|money}}</td>
+                <td class="balance debit {% if t.debit_balance == 0 %}zero{% endif %}">{{t.debit_balance|money}}</td>
+                <td class="balance credit {% if t.credit_balance == 0 %}zero{% endif %}">{{t.credit_balance|money}}</td>
             </tr>
         {% endfor %}
+        <tfoot>
+            <tr class="{% if account.is_nominal %}nominal{% endif %}">
+                <td colspan="2"></td>
+                <td class="turnover debit">{{account.debit_turnover|money}}</td>
+                <td class="turnover credit">{{account.credit_turnover|money}}</td>
+                <td class="balance debit {% if account.debit_balance == 0 %}zero{% endif %}">{{account.debit_balance|money}}</td>
+                <td class="balance credit {% if account.credit_balance == 0 %}zero{% endif %}">{{account.credit_balance|money}}</td>
+            </tr>
+        </tfoot>
     </table>
 </div>

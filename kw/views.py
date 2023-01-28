@@ -7,20 +7,10 @@ def index(request):
 	return redirect("accounts", permanent=False)
 
 def accounts(request):
-	accounts = Account.objects.select_related("turnover").all()
-
-	balance_accounts = []
-	nominal_accounts = []
-
-	for acc in accounts:
-		if acc.is_nominal:
-			nominal_accounts.append(acc)
-		else:
-			balance_accounts.append(acc)
+	accounts = TopAccounts()
 
 	return render(request, 'kw/index.html', {
-		'balance_accounts': balance_accounts,
-		'nominal_accounts': nominal_accounts,
+		'top_accounts': accounts,
 	})
 
 def account(request, acc_id):
