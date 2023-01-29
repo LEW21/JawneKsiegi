@@ -20,7 +20,7 @@
 
 {% block content %}
 
-{% if account.children %}
+{% if account.descendants %}
 	<h2>Subkonta</h2>
 	{% with account=account %}
 		{% include "kw/_accounts.html" %}

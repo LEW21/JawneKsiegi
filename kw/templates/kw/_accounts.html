@@ -12,7 +12,7 @@
                 <th class="money">Saldo<br>Ma</th>
             </tr>
         </thead>
-        {% for t in account.children %}
+        {% for t in account.descendants %}
             <tr data-id="{{t.num_id}}" data-parent="{% if t.parent_id %}{{t.parent_id}}{% endif %}" class="{% if t.debit_balance == 0 and t.credit_balance == 0 %}zero{% endif %} {% if t.is_nominal %}nominal{% endif %} level{{t.level}}"{% if t.level > account.levelP1 %} style="display: none;"{% endif %}>
                 <td class="num-id"><span><a href="{{t.url}}">{{t.local_id}}</a></span></td>
                 <td>{{t.pub_name}}</td>
@@ -25,10 +25,10 @@
         <tfoot>
             <tr class="{% if account.is_nominal %}nominal{% endif %}">
                 <td colspan="2"></td>
-                <td class="turnover debit">{{account.debit_turnover|money}}</td>
-                <td class="turnover credit">{{account.credit_turnover|money}}</td>
-                <td class="balance debit {% if account.debit_balance == 0 %}zero{% endif %}">{{account.debit_balance|money}}</td>
-                <td class="balance credit {% if account.credit_balance == 0 %}zero{% endif %}">{{account.credit_balance|money}}</td>
+                <td class="turnover debit">{{account.descendants_debit_turnover|money}}</td>
+                <td class="turnover credit">{{account.descendants_credit_turnover|money}}</td>
+                <td class="balance debit {% if account.descendants_debit_balance == 0 %}zero{% endif %}">{{account.descendants_debit_balance|money}}</td>
+                <td class="balance credit {% if account.descendants_credit_balance == 0 %}zero{% endif %}">{{account.descendants_credit_balance|money}}</td>
             </tr>
         </tfoot>
     </table>

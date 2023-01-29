@@ -17,14 +17,10 @@ class Migration(migrations.Migration):
 			name='Account',
 			fields=[
 				('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-				('num_id', models.CharField(max_length=30, verbose_name='numeric id')),
-				('name', models.CharField(max_length=200, verbose_name='name')),
+				('num_id', models.TextField()),
+				('name', models.TextField()),
 			],
-			options={
-				'verbose_name': 'account',
-				'verbose_name_plural': 'accounts',
-				'ordering': ['num_id'],
-			},
+			options={},
 		),
 		migrations.CreateModel(
 			name='Document',
@@ -50,21 +46,6 @@ class Migration(migrations.Migration):
 			options={
 				'verbose_name': 'document type',
 				'verbose_name_plural': 'document types',
-			},
-		),
-		migrations.CreateModel(
-			name='Turnover',
-			fields=[
-				('id', models.OneToOneField(db_column='id', on_delete=django.db.models.deletion.DO_NOTHING, primary_key=True, related_name='turnover', serialize=False, to='kw.account', verbose_name='account')),
-				('debit', models.IntegerField(verbose_name='debit')),
-				('credit', models.IntegerField(verbose_name='credit')),
-				('debit_balance', models.IntegerField(verbose_name='debit balance')),
-				('credit_balance', models.IntegerField(verbose_name='credit balance')),
-			],
-			options={
-				'verbose_name': 'turnover',
-				'verbose_name_plural': 'turnovers',
-				'managed': False,
 			},
 		),
 		migrations.CreateModel(
@@ -96,17 +77,4 @@ class Migration(migrations.Migration):
 			name='document',
 			unique_together={('issuer_name', 'number')},
 		),
-		migrations.RunSQL(
-"""CREATE VIEW kw_turnover_own AS
-SELECT a.id, a.num_id, coalesce(debit, 0) as debit, coalesce(credit, 0) as credit, coalesce(debit, 0)-coalesce(credit, 0) as balance
-FROM kw_account a
-LEFT JOIN (
-		SELECT k.id as acc, sum(dst.amount) as debit FROM kw_account k
-		LEFT JOIN kw_event dst ON k.id = dst.dst_id AND dst.date <= date()
-		GROUP BY k.id) wn ON wn.acc = a.id
-LEFT JOIN (
-		SELECT k.id as acc, sum(src.amount) as credit FROM kw_account k
-		LEFT JOIN kw_event src ON k.id = src.src_id AND src.date <= date()
-		GROUP BY k.id) ma ON ma.acc = a.id
-ORDER BY id;"""),
 	]

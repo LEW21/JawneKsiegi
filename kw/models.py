@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from datetime import date
-from dataclasses import dataclass
-from typing import TypeVar
+from dataclasses import dataclass, field
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.db import connection
+from itertools import chain
 
-class AccountMixin:
+@dataclass(frozen=True)
+class AbstractAccount:
 	@property
 	@abstractmethod
 	def num_id(self) -> str:
@@ -15,66 +17,8 @@ class AccountMixin:
 
 	@property
 	@abstractmethod
-	def level(self) -> int:
+	def name(self) -> str:
 		...
-
-	@property
-	@abstractmethod
-	def _children(self) -> models.BaseManager[Account]:
-		...
-
-	@property
-	@abstractmethod
-	def is_nominal(self) -> bool:
-		...
-
-	@property
-	def levelP1(self):
-		return self.level + 1
-
-	@property
-	def children(self) -> list[Account]:
-		accounts = list(self._children.select_related('own_turnover'))
-		acc_by_id = {self.num_id: self}
-		self.debit_turnover = 0
-		self.credit_turnover = 0
-		self.debit_balance = 0
-		self.credit_balance = 0
-		for acc in accounts:
-			acc.debit_turnover = acc.own_turnover.debit
-			acc.credit_turnover = acc.own_turnover.credit
-			acc.debit_balance = acc.own_turnover.debit_balance
-			acc.credit_balance = acc.own_turnover.credit_balance
-			acc_by_id[acc.num_id] = acc
-			ancestor = acc
-			while (ancestor.num_id and (ancestor := acc_by_id.get(ancestor.parent_id, None))):
-				ancestor.debit_turnover += acc.debit_turnover
-				ancestor.credit_turnover += acc.credit_turnover
-				ancestor.debit_balance += acc.debit_balance
-				ancestor.credit_balance += acc.credit_balance
-
-		return accounts
-
-@dataclass
-class TopAccount(AccountMixin):
-	num_id = None
-	level = -1
-	is_nominal: bool = None
-	_children: models.BaseManager[Account] = None
-
-class TopAccounts:
-	def __init__(self):
-		self.balance = TopAccount(False, Account.objects.exclude(num_id__startswith='7'))
-		self.nominal = TopAccount(True, Account.objects.filter(num_id__startswith='7'))
-
-class Account(AccountMixin, models.Model):
-	class Meta:
-		verbose_name = _('account')
-		verbose_name_plural = _('accounts')
-		ordering = ['num_id']
-
-	num_id = models.CharField(_("numeric id"), max_length=30)
-	name = models.CharField(_("name"), max_length=200)
 
 	@property
 	def url(self):
@@ -86,7 +30,11 @@ class Account(AccountMixin, models.Model):
 
 	@property
 	def level(self):
-		return self.num_id.count("-")
+		return self.num_id.count("-") if self.num_id else -1
+
+	@property
+	def levelP1(self):
+		return self.level + 1
 
 	@property
 	def local_id(self):
@@ -112,10 +60,6 @@ class Account(AccountMixin, models.Model):
 			return self.parent_cache
 
 	@property
-	def _children(self):
-		return Account.objects.filter(num_id__startswith=self.num_id + "-")
-
-	@property
 	def pub_name(self):
 		return self.name
 
@@ -125,6 +69,78 @@ class Account(AccountMixin, models.Model):
 
 	def __str__(self):
 		return self.num_id + ". " + self.pub_name
+
+	@property
+	def descendants(self) -> list[Account]:
+		try:
+			return self._descendants
+		except AttributeError:
+			pass
+
+		SQL = lambda where: f"""
+			SELECT a.num_id, a.name, coalesce(debit, 0) as own_debit, coalesce(credit, 0) as own_credit, coalesce(debit, 0)-coalesce(credit, 0) as own_balance
+			FROM kw_account a
+			LEFT JOIN (
+					SELECT k.id as acc, sum(dst.amount) as debit FROM kw_account k
+					LEFT JOIN kw_event dst ON k.id = dst.dst_id AND dst.date <= date()
+					GROUP BY k.id) wn ON wn.acc = a.id
+			LEFT JOIN (
+					SELECT k.id as acc, sum(src.amount) as credit FROM kw_account k
+					LEFT JOIN kw_event src ON k.id = src.src_id AND src.date <= date()
+					GROUP BY k.id) ma ON ma.acc = a.id
+			WHERE {where}
+			ORDER BY a.num_id ASC;
+		"""
+
+		with connection.cursor() as cursor:
+			if self.num_id:
+				cursor.execute(SQL("""(a."num_id" LIKE %s)"""), [self.num_id + '-%'])
+			elif self.is_nominal:
+				cursor.execute(SQL("""(a."num_id" LIKE '7%')"""))
+			else:
+				cursor.execute(SQL("""(a."num_id" NOT LIKE '7%')"""))
+
+			acc_by_id = {}
+			for acc in chain([self], (NormalAccount(*row) for row in cursor)):
+				object.__setattr__(acc, '_descendants', [])
+				acc_by_id[acc.num_id] = acc
+				ancestor = acc
+				while (ancestor.num_id and (ancestor := acc_by_id.get(ancestor.parent_id, None))):
+					ancestor._descendants.append(acc)
+
+		return self._descendants
+
+	@property
+	def debit_turnover(self) -> int:
+		return sum(acc.own_debit for acc in [self] + self.descendants)
+
+	@property
+	def credit_turnover(self) -> int:
+		return sum(acc.own_credit for acc in [self] + self.descendants)
+
+	@property
+	def debit_balance(self) -> int:
+		return sum(max(acc.own_balance, 0) for acc in [self] + self.descendants)
+
+	@property
+	def credit_balance(self) -> int:
+		return sum(max(-acc.own_balance, 0) for acc in [self] + self.descendants)
+
+	@property
+	def descendants_debit_turnover(self) -> int:
+		return sum(acc.own_debit for acc in self.descendants)
+
+	@property
+	def descendants_credit_turnover(self) -> int:
+		return sum(acc.own_credit for acc in self.descendants)
+
+	@property
+	def descendants_debit_balance(self) -> int:
+		return sum(max(acc.own_balance, 0) for acc in self.descendants)
+
+	@property
+	def descendants_credit_balance(self) -> int:
+		return sum(max(-acc.own_balance, 0) for acc in self.descendants)
 
 	@dataclass
 	class AccountEvent:
@@ -159,22 +175,32 @@ class Account(AccountMixin, models.Model):
 	def future_events(self):
 		return [e for e in self.events if e.date > date.today()]
 
-class Turnover_Own(models.Model):
-	class Meta:
-		verbose_name = _('turnover')
-		verbose_name_plural = _('turnovers')
-		managed = False
+@dataclass(frozen=True)
+class NormalAccount(AbstractAccount):
+	num_id: str = field(default=None)
+	name: str = field(default=None)
+	own_debit: int = field(default=None)
+	own_credit: int = field(default=None)
+	own_balance: int = field(default=None)
 
-	id = models.OneToOneField(Account, verbose_name=_("account"), primary_key=True, related_name="own_turnover", db_column="id", on_delete=models.DO_NOTHING)
-	debit = models.IntegerField(_("debit"))
-	credit = models.IntegerField(_("credit"))
-	balance = models.IntegerField()
-	@property
-	def credit_balance(self):
-		return max(-self.balance, 0)
-	@property
-	def debit_balance(self):
-		return max(self.balance, 0)
+@dataclass(frozen=True)
+class TopAccount(AbstractAccount):
+	is_nominal: bool = field(default=None)
+
+	num_id = None
+	name = ""
+	own_debit = 0
+	own_credit = 0
+	own_balance = 0
+
+class TopAccounts:
+	def __init__(self):
+		self.balance = TopAccount(False)
+		self.nominal = TopAccount(True)
+
+class Account(models.Model, AbstractAccount):
+	num_id = models.TextField()
+	name = models.TextField()
 
 def format_amount(amount, add_sign = True):
 	sign = 1 if amount > 0 else -1 if amount < 0 else 0
