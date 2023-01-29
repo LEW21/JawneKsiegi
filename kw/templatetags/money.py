@@ -4,7 +4,7 @@ from django.template.defaultfilters import stringfilter
 register = template.Library()
 
 def format_amount(amount, add_sign = True):
-	if amount is None:
+	if not isinstance(amount, int):
 		return ''
 	sign = 1 if amount > 0 else -1 if amount < 0 else 0
 	abs_amount = amount if sign >= 0 else -amount
