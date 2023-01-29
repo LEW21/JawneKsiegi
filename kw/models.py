@@ -7,6 +7,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db import connection
 from itertools import chain
+import threading
+
+world = threading.local()
 
 @dataclass(frozen=True)
 class AbstractAccount:
@@ -23,7 +26,7 @@ class AbstractAccount:
 	@property
 	def url(self):
 		from django.urls import reverse
-		return reverse('account', args=[str(self.num_id)])
+		return reverse('date_account', args=[world.date.isoformat(), str(self.num_id)])
 
 	def get_absolute_url(self):
 		return self.url
@@ -82,11 +85,11 @@ class AbstractAccount:
 			FROM kw_account a
 			LEFT JOIN (
 					SELECT k.id as acc, sum(dst.amount) as debit FROM kw_account k
-					LEFT JOIN kw_event dst ON k.id = dst.dst_id AND dst.date <= date()
+					LEFT JOIN kw_event dst ON k.id = dst.dst_id AND dst.date <= %s
 					GROUP BY k.id) wn ON wn.acc = a.id
 			LEFT JOIN (
 					SELECT k.id as acc, sum(src.amount) as credit FROM kw_account k
-					LEFT JOIN kw_event src ON k.id = src.src_id AND src.date <= date()
+					LEFT JOIN kw_event src ON k.id = src.src_id AND src.date <= %s
 					GROUP BY k.id) ma ON ma.acc = a.id
 			WHERE {where}
 			ORDER BY a.num_id ASC;
@@ -94,11 +97,11 @@ class AbstractAccount:
 
 		with connection.cursor() as cursor:
 			if self.num_id:
-				cursor.execute(SQL("""(a."num_id" LIKE %s)"""), [self.num_id + '-%'])
+				cursor.execute(SQL("""(a."num_id" LIKE %s)"""), [world.date, world.date, self.num_id + '-%'])
 			elif self.is_nominal:
-				cursor.execute(SQL("""(a."num_id" LIKE '7%')"""))
+				cursor.execute(SQL("""(a."num_id" LIKE '7%%')"""), [world.date, world.date])
 			else:
-				cursor.execute(SQL("""(a."num_id" NOT LIKE '7%')"""))
+				cursor.execute(SQL("""(a."num_id" NOT LIKE '7%%')"""), [world.date, world.date])
 
 			acc_by_id = {}
 			for acc in chain([self], (NormalAccount(*row) for row in cursor)):
@@ -169,11 +172,11 @@ class AbstractAccount:
 
 	@property
 	def past_events(self):
-		return [e for e in self.events if e.date <= date.today()]
+		return [e for e in self.events if e.date <= world.date]
 
 	@property
 	def future_events(self):
-		return [e for e in self.events if e.date > date.today()]
+		return [e for e in self.events if e.date > world.date]
 
 @dataclass(frozen=True)
 class NormalAccount(AbstractAccount):
@@ -247,7 +250,7 @@ class Document(models.Model):
 	def url(self):
 		from django.urls import reverse
 		try:
-			return reverse('doc', args=[self.issuer_name, self.number.replace("/", "-")])
+			return reverse('date_doc', args=[world.date.isoformat(), self.issuer_name, self.number.replace("/", "-")])
 		except:
 			return ""
 

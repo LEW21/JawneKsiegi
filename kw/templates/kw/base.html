@@ -20,11 +20,12 @@
 			<div class="bg left"></div>
 			<div class="bg right"></div>
 			<div class="container">
-				{% block top %}<h1>Księga główna i księgi pomocnicze</h1>{% endblock %}
+				{% block top %}<h1>Konta</h1>{% endblock %}
 			</div>
 		</div>
 
 		<div class="container">
+			<p style="margin-top: 2em; text-align: right; font-weight: bold;">Stany na {{world_date}}</p>
 			{% block content %}{% endblock %}
 
 			<hr>

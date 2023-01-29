@@ -1,19 +1,25 @@
 from dataclasses import dataclass
+from datetime import date as Date
 from django.shortcuts import render, redirect
 from django.http import Http404
 from .models import *
 
 def index(request):
-	return redirect("accounts", permanent=False)
+	return redirect("date_accounts", date.today().isoformat(), permanent=False)
 
-def accounts(request):
+def date_accounts(request, date: str):
+	world.date = Date.fromisoformat(date)
+
 	accounts = TopAccounts()
 
 	return render(request, 'kw/index.html', {
+		'world_date': world.date,
 		'top_accounts': accounts,
 	})
 
-def account(request, acc_id):
+def date_account(request, date: str, acc_id: str):
+	world.date = Date.fromisoformat(date)
+
 	try:
 		a = Account.objects.get(num_id=acc_id)
 	except Account.DoesNotExist:
@@ -34,6 +40,7 @@ def account(request, acc_id):
 	fbalance = balance
 
 	return render(request, 'kw/index.html', {
+		'world_date': world.date,
 		'account': a,
 		'events': pev,
 		'future_events': fev,
@@ -49,24 +56,30 @@ class Actor:
 	def __str__(self):
 		return self.name
 
-def actor(request, actor_id):
-	docs = list(Document.objects.filter(issuer_name = actor_id).order_by('date'))
+def date_party(request, date: str, party_id: str):
+	world.date = Date.fromisoformat(date)
+
+	docs = list(Document.objects.filter(issuer_name = party_id).order_by('date'))
 	if len(docs) == 0:
 		raise Http404
 
 	return render(request, 'kw/actor.html', {
+		'world_date': world.date,
 		'actor': Actor(
-			name = actor_id,
+			name = party_id,
 			issued_documents = docs
 		)
 	})
 
-def doc(request, actor_id, doc_id):
+def date_doc(request, date: str, party_id: str, doc_id: str):
+	world.date = Date.fromisoformat(date)
+
 	try:
-		d = Document.objects.get(issuer_name = actor_id, number = doc_id.replace("-", "/"))
+		d = Document.objects.get(issuer_name = party_id, number = doc_id.replace("-", "/"))
 	except Document.DoesNotExist:
 		raise Http404
 
 	return render(request, 'kw/doc.html', {
+		'world_date': world.date,
 		'doc': d
 	})
