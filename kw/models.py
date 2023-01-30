@@ -114,6 +114,10 @@ class AbstractAccount:
 		return self._descendants
 
 	@property
+	def children(self) -> list[Account]:
+		return [acc for acc in self.descendants if acc.level == self.level + 1]
+
+	@property
 	def debit_turnover(self) -> int:
 		return sum(acc.own_debit for acc in [self] + self.descendants)
 
@@ -196,10 +200,42 @@ class TopAccount(AbstractAccount):
 	own_credit = 0
 	own_balance = 0
 
-class TopAccounts:
+class Book:
 	def __init__(self):
 		self.balance = TopAccount(False)
 		self.nominal = TopAccount(True)
+
+	@property
+	def current_result(self):
+		return CurrentResult(self)
+
+	@property
+	def past_results(self):
+		return PastResults(self)
+
+class CurrentResult:
+	def __init__(self, book: Book):
+		self.book = book
+
+	@property
+	def debit_balance(self):
+		return 0
+
+	@property
+	def credit_balance(self):
+		return sum(sum(child.credit_balance - child.debit_balance for child in acc.children if int(child.local_id) == world.date.year) for acc in self.book.nominal.children)
+
+class PastResults:
+	def __init__(self, book: Book):
+		self.book = book
+
+	@property
+	def debit_balance(self):
+		return 0
+
+	@property
+	def credit_balance(self):
+		return sum(sum(child.credit_balance - child.debit_balance for child in acc.children if int(child.local_id) < world.date.year) for acc in self.book.nominal.children)
 
 class Account(models.Model, AbstractAccount):
 	num_id = models.TextField()

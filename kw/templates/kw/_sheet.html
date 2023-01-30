@@ -1,0 +1,11 @@
+{% load money %}
+
+<table class="table tbl-sheet nomargin">
+	{% for t in sheet_accounts %}
+		<tr class="{% if t.amount == 0 %}zero{% endif %} level{{t.level}}">
+			<td><span>{% if t.local_id %}<span style="width: 20px; display: inline-block;">{{t.local_id}}. </span>{% endif %}<span>{{t.name}}</span></span></td>
+			<td class="balance {% if t.amount == 0 %}zero{% endif %} {{t.side}}">{{t.amount|money}}</td>
+		</tr>
+	{% endfor %}
+	<tfoot></tfoot>
+</table>

@@ -28,6 +28,16 @@
 {% endif %}
 
 {% if top_accounts.balance %}
+	<h2>Bilans</h2>
+	<div style="display: flex; justify-items: flex-start;" class="unit">
+		{% with sheet_accounts=debit_sheet_accounts %}
+			{% include "kw/_sheet.html" %}
+		{% endwith %}
+		{% with sheet_accounts=credit_sheet_accounts %}
+			{% include "kw/_sheet.html" %}
+		{% endwith %}
+	</div>
+
 	<h2>Konta bilansowe</h2>
 	{% with account=top_accounts.balance %}
 		{% include "kw/_accounts.html" %}

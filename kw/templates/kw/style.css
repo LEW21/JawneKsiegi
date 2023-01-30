@@ -192,34 +192,34 @@ tr:not(.nominal) .balance.credit:not(.zero), tr.nominal .balance.debit:not(.zero
   content: "▼"; }
 
 
-.accounts tbody tr > .num-id > span {
-  display: block;
-}
-.accounts tbody tr > .num-id > span {
+tbody tr > :first-child > span {
+  display: block; }
+
+tbody tr.level0 > :first-child > span {
   padding-left: 28px; }
   
-.accounts tbody tr.level1 > .num-id > span {
+tbody tr.level1 > :first-child > span {
   padding-left: 48px; }
 
-.accounts tbody tr.level2 > .num-id > span {
+tbody tr.level2 > :first-child > span {
   padding-left: 68px; }
 
-.accounts tbody tr.level3 > .num-id > span {
+tbody tr.level3 > :first-child > span {
   padding-left: 88px; }
 
-.accounts tbody tr.level4 > .num-id > span {
+tbody tr.level4 > :first-child > span {
   padding-left: 108px; }
 
-.accounts tbody tr.level5 > .num-id > span {
+tbody tr.level5 > :first-child > span {
   padding-left: 128px; }
 
-.accounts tbody tr.level6 > .num-id > span {
+tbody tr.level6 > :first-child > span {
   padding-left: 148px; }
 
-.accounts tbody tr.level7 > .num-id > span {
+tbody tr.level7 > :first-child > span {
   padding-left: 168px; }
 
-.accounts tbody tr.level8 > .num-id > span {
+tbody tr.level8 > :first-child > span {
   padding-left: 188px; }
 
 
@@ -273,3 +273,28 @@ tr:not(.nominal) .balance.credit:not(.zero), tr.nominal .balance.debit:not(.zero
 .tbl-journal-events tr > :nth-last-child(3) { flex: 0 0  80px; text-align: right; }
 .tbl-journal-events tr > :nth-last-child(2) { flex: 0 0 100px; text-align: left; }
 .tbl-journal-events tr > :nth-last-child(1) { flex: 0 0  80px; text-align: right; }
+
+.tbl-sheet, .tbl-sheet thead, .tbl-sheet tbody, .tbl-sheet tfoot { display: block; width: 100%; }
+
+.tbl-sheet tr { display: flex; }
+
+.tbl-sheet tr > * { overflow: hidden; }
+.tbl-sheet tr > :nth-last-child(2) { flex: 1 1 200px; text-align: left; }
+.tbl-sheet tr > :nth-last-child(1) { flex: 0 0 90px; text-align: right; }
+
+.tbl-sheet tfoot {
+  flex: 1;
+  background-color: white;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+}
+
+tbody {
+  overflow-y: hidden;
+}
+tbody > :last-child {
+  margin-bottom: -1px;
+}

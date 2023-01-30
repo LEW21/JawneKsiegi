@@ -1,20 +1,30 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import date as Date
 from django.shortcuts import render, redirect
 from django.http import Http404
 from .models import *
+from .sheet import BalanceSheetAccount, make_side, debit_template, credit_template
 
 def index(request):
 	return redirect("date_accounts", date.today().isoformat(), permanent=False)
 
+def flatten_sheet(accounts: list[BalanceSheetAccount]):
+	for acc in accounts:
+		yield acc
+		yield from flatten_sheet(acc.subaccounts)
+
 def date_accounts(request, date: str):
 	world.date = Date.fromisoformat(date)
 
-	accounts = TopAccounts()
+	book = Book()
 
 	return render(request, 'kw/index.html', {
 		'world_date': world.date,
-		'top_accounts': accounts,
+		'top_accounts': book,
+		'debit_sheet_accounts': flatten_sheet(make_side('debit', 0, debit_template, book)),
+		'credit_sheet_accounts': flatten_sheet(make_side('credit', 0, credit_template, book)),
 	})
 
 def date_account(request, date: str, acc_id: str):
