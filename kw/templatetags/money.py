@@ -1,5 +1,5 @@
 from django import template
-from django.template.defaultfilters import stringfilter
+import locale
 
 register = template.Library()
 
@@ -8,7 +8,7 @@ def format_amount(amount, add_sign = True):
 		return ''
 	sign = 1 if amount > 0 else -1 if amount < 0 else 0
 	abs_amount = amount if sign >= 0 else -amount
-	return ("+" if sign > 0 and add_sign else "-" if sign < 0 else "") + str(int(abs_amount/100)) + "." + str(abs_amount%100).zfill(2)
+	return ("+" if sign > 0 and add_sign else "-" if sign < 0 else "") + locale.format_string('%.2f', abs_amount/100, grouping=True, monetary=True)
 
 @register.filter
 def money(value):

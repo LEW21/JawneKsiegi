@@ -36,3 +36,6 @@ from dj12.config import *
 
 if DEBUG:
 	INTERNAL_IPS = ['127.0.0.1']
+
+import locale
+locale.setlocale(locale.LC_ALL, '')
