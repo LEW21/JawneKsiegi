@@ -23,7 +23,7 @@ debit_template = {
 			"I. Zapasy": {"310"},
 			"II. Należności krótkoterminowe": {"200", "301", "302", "303"},
 			"III. Inwestycje krótkoterminowe": {"130"},
-			"IV. Krótkoterminowe rozliczenia międzyokresowe": {"640", "841", "842"},
+			"IV. Krótkoterminowe rozliczenia międzyokresowe": {"640"},
 		},
 		"C. Należne wpłaty na fundusz statutowy": {},
 	},
@@ -41,7 +41,7 @@ credit_template = {
 			"I. Rezerwy na zobowiązania": {"840"},
 			"II. Zobowiązania długoterminowe": {},
 			"III. Zobowiązania krótkoterminowe": {"200", "301", "302", "303", "130", "310"},
-			"IV. Rozliczenia międzyokresowe": {"640", "841", "842"},
+			"IV. Rozliczenia międzyokresowe": {"640"},
 		}
 	},
 }
